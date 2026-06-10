@@ -1,0 +1,153 @@
+<!-- ==================================================
+   BLOCK 01 — DOCUMENT SETTINGS / НАСТРОЙКИ ДОКУМЕНТА
+================================================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Dashboard | Crypto Portfolio</title>
+
+    <link rel="stylesheet" href="css/scene.css">
+
+    <!-- Three.js imports -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+        }
+    }
+</script>
+</head>
+<body>
+    
+    <!-- ==================================================
+       BLOCK 02 — HEADER / ШАПКА
+    ================================================== -->
+    <header class="scene-header">
+        <div>
+            <p class="eyebrow">Crypto Portfolio</p>
+            <h1>3D Dashboard</h1>
+        </div>
+
+        <nav class="scene-nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="transactions.html">Transactions</a>
+            <a href="scene.html" class="active"> 3D View</a>
+        </nav>
+    </header>
+
+
+    <!-- ==================================================
+       BLOCK 03 — MAIN LAYOUT / ОСНОВНАЯ СТРУКТУРА
+    ================================================== -->
+    <main class="scene-page">
+
+        <!-- LEFT INFO PANEL -->
+        <aside class="scene-panel">
+            <div class="panel-card">
+                <p class="panel-label">Total 3D Value</p>
+                <h2 id="sceneTotalValue">€0.00</h2>
+                <span id="sceneStatus" class="scene-status">Loading portfolio...</span>
+            </div>
+
+            <div class="panel-card">
+                <p class="panel-label">Legend</p>
+
+                <div class="legend-row">
+                    <span class="legend-dot profit"></span>
+                    <span>Profit</span>
+                </div>
+
+                <div class="legend-row">
+                    <span class="legend-dot loss"></span>
+                    <span>Loss</span>
+                </div>
+
+                <div class="legend-row">
+                    <span class="legend-dot neutral"></span>
+                    <span>Neutral</span>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <p class="panel-label">Assets</p>
+                <div id="sceneAssetsList" class="assets-list">
+                    No assets loaded yet.
+                </div>
+            </div>
+        </aside>
+
+
+        <!-- 3D CANVAS AREA -->
+        <section class="scene-wrapper">
+            <div class="scene-toolbar">
+                <div>
+                    <p class="toolbar-small">Visualization</p>
+                    <h2>Portfolio Objects</h2>
+                </div>
+
+                <button id="reloadSceneBtn" type="button">
+                    Reload 3D
+                </button>
+            </div>
+
+            <div id="threeContainer" class="three-container"></div>
+        </section>
+
+    </main>
+
+    
+    <!-- ==================================================
+    BLOCK 04 — COIN INFO MODAL / МОДАЛЬНОЕ ОКНО МОНЕТЫ
+    ================================================== -->
+    <div id="coinModal" class="coin-modal hidden">
+        <div class="coin-modal-card">
+            <button id="closeCoinModal" class="coin-modal-close" type="button">×</button>
+            
+            <p class="modal-label">Selected Asset</p>
+            <h2 id="modalCoinSymbol">BTC</h2>
+            
+            <div class="modal-grid">
+                <div>
+                    <span>Quantity</span>
+                    <strong id="modalCoinQuantity">0</strong>
+                </div>
+                
+                <div>
+                    <span>Current Price</span>
+                    <strong id="modalCoinPrice">€0.00</strong>
+                </div>
+                
+                <div>
+                    <span>Total Value</span>
+                    <strong id="modalCoinValue">€0.00</strong>
+                </div>
+                
+                <div>
+                    <span>Profit / Loss</span>
+                    <strong id="modalCoinProfit">€0.00</strong>
+                </div>
+
+                <div>
+                    <span>Profit %</span>
+                    <strong id="modalCoinProfitPercent">0%</strong>
+                </div>
+
+                <div>
+                    <span>Portfolio Share</span>
+                    <strong id="modalCoinAllocation">0%</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================
+       BLOCK 05 — JAVASCRIPT CONNECTION / ПОДКЛЮЧЕНИЕ JAVASCRIPT
+    ================================================== -->
+    <script type="module" src="js/scene.js"></script>
+
+
+</body>
+</html>

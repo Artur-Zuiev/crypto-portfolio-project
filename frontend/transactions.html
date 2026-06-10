@@ -1,0 +1,61 @@
+<!-- ==================================================
+   BLOCK 01 — DOCUMENT SETTINGS / НАСТРОЙКИ ДОКУМЕНТА
+================================================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions | Crypto Portfolio</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ================================================== -->
+    <!-- BLOCK 02 — HEADER / NAVIGATION / ШАПКА И НАВИГАЦИЯ -->
+    <!-- ================================================== -->
+    <header class="dashboard-header">
+        <div class="dashboard-logo">
+            <h1>Crypto Portfolio</h1>
+            <p>All transactions</p>
+        </div>
+
+        <nav class="dashboard-nav">
+            <a href="dashboard.html" class="dashboard-nav-link">Dashboard</a>
+            <a href="scene.html" class="dashboard-nav-link">3D Dashboard</a>
+            <a href="transactions.html" class="dashboard-nav-link active">Transactions</a>
+        </nav>
+
+        <div class="header-actions">
+            <button id="logoutBtn" type="button">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+
+        <!-- ================================================== -->
+        <!-- BLOCK 03 — ALL TRANSACTIONS / ВСЕ ТРАНЗАКЦИИ -->
+        <!-- ================================================== -->
+        <section class="transactions-section">
+            <div class="transactions-header">
+                <div>
+                    <p class="transactions-kicker">History</p>
+                    <h2 class="transactions-title">All Transactions</h2>
+                </div>
+
+                <a href="dashboard.html" class="transactions-view-btn">
+                    Back to Dashboard
+                </a>
+            </div>
+
+            <div class="transactions-list" id="allTransactionsList">
+                <!-- All transactions will be rendered here by JavaScript -->
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/transactions.js"></script>
+</body>
+</html>

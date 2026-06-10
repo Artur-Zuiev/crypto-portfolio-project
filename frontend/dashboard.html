@@ -1,0 +1,457 @@
+<!-- ==================================================
+   BLOCK 01 — DOCUMENT SETTINGS / НАСТРОЙКИ ДОКУМЕНТА
+================================================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Crypto Portfolio</title>
+
+    <!-- Main dashboard styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ================================================== -->
+    <!-- BLOCK 02 — HEADER / NAVIGATION / ШАПКА И НАВИГАЦИЯ -->
+    <!-- ================================================== -->
+    <header class="dashboard-header">
+        <div class="dashboard-logo">
+            <h1>Crypto Portfolio</h1>
+            <p>Dashboard overview</p>
+        </div>
+
+        <nav class="dashboard-nav">
+            <a href="dashboard.html" class="dashboard-nav-link active">Dashboard</a>
+            <a href="scene.html" class="dashboard-nav-link">3D Dashboard</a>
+        </nav>
+
+        <div class="header-actions">
+            <button id="refreshPricesBtn" type="button">Refresh Prices</button>
+            <button id="logoutBtn" type="button">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+
+        <!-- ================================================== -->
+        <!-- BLOCK 03 — USER PROFILE / ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ -->
+        <!-- ================================================== -->
+        <section class="user-card user-profile-card">
+            <div class="user-profile-left">
+                <div class="user-avatar" id="userAvatar">?</div>
+
+                <div class="user-profile-info">
+                    <span class="user-profile-label">Account overview</span>
+                    <h2 id="userName">Loading user...</h2>
+                    <p id="userEmail">Please wait...</p>
+                </div>
+            </div>
+
+            <div class="user-profile-right">
+                <div class="price-update-box">
+                    <span>Last price update</span>
+                    <strong id="lastUpdatedInfo">not updated yet</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================== -->
+        <!-- BLOCK 04 — SUMMARY CARDS / КАРТОЧКИ СТАТИСТИКИ -->
+        <!-- ================================================== -->
+        <section class="summary-grid">
+            <div class="summary-card">
+                <h3>Total Value</h3>
+                <p id="totalValue">0</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Total Invested</h3>
+                <p id="totalInvested">0</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Profit / Loss</h3>
+                <p id="totalProfitLoss">0</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Assets</h3>
+                <p id="assetCount">0</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Best Coin</h3>
+                <p id="bestCoin">-</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Worst Coin</h3>
+                <p id="worstCoin">-</p>
+            </div>
+        </section>
+
+        <!-- ================================================== -->
+        <!-- BLOCK 05 — ADD TRANSACTION FORM / ФОРМА ДОБАВЛЕНИЯ СДЕЛКИ -->
+        <!-- ================================================== -->
+        <section class="add-crypto-card">
+            <h2>Add Transaction</h2>
+
+            <form id="addCryptoForm">
+                <label class="form-label">Transaction Type</label>
+
+                <div class="transaction-type-switch">
+                    <button 
+                        type="button" 
+                        class="transaction-switch-btn active" 
+                        data-type="BUY"
+                        id="buyTypeBtn"
+                    >
+                        BUY
+                        <span>Add coins to portfolio</span>
+                    </button>
+
+                    <button 
+                        type="button" 
+                        class="transaction-switch-btn" 
+                        data-type="SELL"
+                        id="sellTypeBtn"
+                    >
+                        SELL
+                        <span>Reduce your position</span>
+                    </button>
+                </div>
+
+                <input type="hidden" id="transactionType" value="BUY">
+
+                <div class="transaction-form-grid">
+
+                    <!-- ================================================== -->
+                    <!-- BLOCK 05.1 — CUSTOM CRYPTO DROPDOWN / ВЫБОР КРИПТЫ -->
+                    <!-- ================================================== -->
+                    <div class="transaction-field transaction-field-full">
+                        <label for="cryptoCurrencyId" class="form-label">Cryptocurrency</label>
+
+                        <!-- Real select for JavaScript and backend value -->
+                        <select id="cryptoCurrencyId" name="cryptoCurrencyId" class="native-crypto-select">
+                            <option value="">Choose crypto</option>
+                            <option value="1" data-symbol="BTC" data-name="Bitcoin" data-price="0">BTC - Bitcoin</option>
+                            <option value="2" data-symbol="ETH" data-name="Ethereum" data-price="0">ETH - Ethereum</option>
+                            <option value="3" data-symbol="SOL" data-name="Solana" data-price="0">SOL - Solana</option>
+                            <option value="4" data-symbol="ADA" data-name="Cardano" data-price="0">ADA - Cardano</option>
+                            <option value="5" data-symbol="BNB" data-name="Binance Coin" data-price="0">BNB - Binance Coin</option>
+                        </select>
+
+                        <!-- Custom browser-independent dropdown -->
+                        <div class="crypto-dropdown" id="cryptoDropdown">
+                            <button type="button" class="crypto-dropdown-toggle" id="cryptoDropdownToggle">
+                                <div class="crypto-dropdown-left">
+                                    <span class="crypto-dropdown-icon">?</span>
+
+                                    <div>
+                                        <strong id="cryptoDropdownTitle">Choose crypto</strong>
+                                        <small id="cryptoDropdownSubtitle">Select coin for this transaction</small>
+                                    </div>
+                                </div>
+
+                                <span class="crypto-dropdown-arrow">^</span>
+                            </button>
+
+                            <div class="crypto-dropdown-menu" id="cryptoDropdownMenu">
+                                <button type="button" class="crypto-dropdown-option" data-value="1">
+                                    <span class="crypto-option-icon btc">BTC</span>
+                                    <span>
+                                        <strong>Bitcoin</strong>
+                                        <small>BTC</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="crypto-dropdown-option" data-value="2">
+                                    <span class="crypto-option-icon eth">ETH</span>
+                                    <span>
+                                        <strong>Ethereum</strong>
+                                        <small>ETH</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="crypto-dropdown-option" data-value="3">
+                                    <span class="crypto-option-icon sol">SOL</span>
+                                    <span>
+                                        <strong>Solana</strong>
+                                        <small>SOL</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="crypto-dropdown-option" data-value="4">
+                                    <span class="crypto-option-icon ada">ADA</span>
+                                    <span>
+                                        <strong>Cardano</strong>
+                                        <small>ADA</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="crypto-dropdown-option" data-value="5">
+                                    <span class="crypto-option-icon bnb">BNB</span>
+                                    <span>
+                                        <strong>Binance Coin</strong>
+                                        <small>BNB</small>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================================================== -->
+                    <!-- BLOCK 05.2 — LIVE MARKET PRICE / ТЕКУЩАЯ ЦЕНА МОНЕТЫ -->
+                    <!-- ================================================== -->
+                    <div class="crypto-price-info transaction-field-full">
+                        <div>
+                            <span>Live market price</span>
+                            <small>Current price from your crypto list</small>
+                        </div>
+
+                        <strong id="selectedCryptoPrice">Select a coin</strong>
+                    </div>
+
+                    <!-- ================================================== -->
+                    <!-- BLOCK 05.3 — QUANTITY / КОЛИЧЕСТВО -->
+                    <!-- ================================================== -->
+                    <div class="transaction-field">
+                        <label for="quantity" class="form-label">Quantity</label>
+
+                        <input 
+                            type="number" 
+                            id="quantity" 
+                            placeholder="0.00" 
+                            step="any" 
+                            min="0"
+                        >
+
+                        <p class="field-help">How many coins?</p>
+                    </div>
+
+                    <!-- ================================================== -->
+                    <!-- BLOCK 05.4 — PRICE PER COIN / ЦЕНА ЗА МОНЕТУ -->
+                    <!-- ================================================== -->
+                    <div class="transaction-field">
+                        <label for="averageBuyPrice" class="form-label">Price per coin</label>
+
+                        <input 
+                            type="number" 
+                            id="averageBuyPrice" 
+                            placeholder="Erste choose crypto" 
+                            step="any" 
+                            min="0"
+                        >
+
+                        <p class="field-help">Price for one coin.</p>
+                    </div>
+
+                    <!-- ================================================== -->
+                    <!-- BLOCK 05.5 — TOTAL PREVIEW / ПРЕДВАРИТЕЛЬНАЯ СУММА -->
+                    <!-- ================================================== -->
+                    <div class="transaction-preview transaction-field-full">
+                        <div>
+                            <span>Total transaction value</span>
+                            <small>Quantity × price per coin</small>
+                        </div>
+
+                        <strong id="transactionPreviewValue">0,00 €</strong>
+                    </div>
+                </div>
+
+                <button type="submit" id="addTransactionBtn">Add Buy Transaction</button>
+            </form>
+
+            <p id="addMessage"></p>
+        </section>
+
+        <!-- ================================================== -->
+        <!-- BLOCK 06 — TRANSACTIONS PREVIEW / ПОСЛЕДНИЕ ТРАНЗАКЦИИ -->
+        <!-- ================================================== -->
+        <section class="transactions-section">
+            <div class="transactions-header">
+                <div>
+                    <p class="transactions-kicker">History</p>
+                    <h2 class="transactions-title">Transactions</h2>
+                </div>
+
+                <a href="transactions.html" class="transactions-view-btn">
+                    View all
+                </a>
+            </div>
+
+            <div class="transactions-list" id="transactionsList">
+                <!-- Transactions will be rendered here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- ================================================== -->
+        <!-- BLOCK 07 — PORTFOLIO ALLOCATION / РАСПРЕДЕЛЕНИЕ ПОРТФЕЛЯ -->
+        <!-- ================================================== -->
+        <section class="allocation-card">
+            <h2>Portfolio Share</h2>
+
+            <div id="allocationChart" class="allocation-chart">
+                <p class="empty-portfolio">No allocation data yet.</p>
+            </div>
+        </section>
+
+        <!-- ================================================== -->
+        <!-- BLOCK 08 — MY PORTFOLIO / СПИСОК КУПЛЕННЫХ МОНЕТ -->
+        <!-- ================================================== -->
+        <section class="portfolio-card">
+            <div class="portfolio-top">
+                <h2>My Portfolio</h2>
+
+                <div class="portfolio-controls">
+                    <div class="portfolio-search">
+                        <label for="searchPortfolio">Search</label>
+                        <input 
+                            type="text" 
+                            id="searchPortfolio" 
+                            placeholder="Search crypto..."
+                        >
+                    </div>
+
+                    <div class="portfolio-sort">
+                        <label for="sortPortfolio">Sort by</label>
+
+                        <!-- Real select for JavaScript sorting logic -->
+                        <select id="sortPortfolio" class="native-sort-select">
+                            <option value="value-desc">Value: High to Low</option>
+                            <option value="value-asc">Value: Low to High</option>
+                            <option value="profit-desc">Profit: High to Low</option>
+                            <option value="profit-asc">Profit: Low to High</option>
+                            <option value="allocation-desc">Allocation: High to Low</option>
+                            <option value="allocation-asc">Allocation: Low to High</option>
+                            <option value="name-asc">Name: A to Z</option>
+                            <option value="name-desc">Name: Z to A</option>
+                        </select>
+
+                        <!-- Custom browser-independent sort dropdown -->
+                        <div class="sort-dropdown" id="sortDropdown">
+                            <button type="button" class="sort-dropdown-toggle" id="sortDropdownToggle">
+                                <div class="sort-dropdown-left">
+                                    <span class="sort-dropdown-icon">↕</span>
+
+                                    <div>
+                                        <strong id="sortDropdownTitle">Value: High to Low</strong>
+                                        <small id="sortDropdownSubtitle">Sort portfolio assets</small>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <div class="sort-dropdown-menu" id="sortDropdownMenu">
+                                <button type="button" class="sort-dropdown-option active" data-value="value-desc">
+                                    <span class="sort-option-icon">€↓</span>
+                                    <span>
+                                        <strong>Value: High to Low</strong>
+                                        <small>Biggest assets first</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="sort-dropdown-option" data-value="value-asc">
+                                    <span class="sort-option-icon">€↑</span>
+                                    <span>
+                                        <strong>Value: Low to High</strong>
+                                        <small>Smallest assets first</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="sort-dropdown-option" data-value="profit-desc">
+                                    <span class="sort-option-icon">+↓</span>
+                                    <span>
+                                        <strong>Profit: High to Low</strong>
+                                        <small>Best profit first</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="sort-dropdown-option" data-value="profit-asc">
+                                    <span class="sort-option-icon">-↑</span>
+                                    <span>
+                                        <strong>Profit: Low to High</strong>
+                                        <small>Worst result first</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="sort-dropdown-option" data-value="allocation-desc">
+                                    <span class="sort-option-icon">%↓</span>
+                                    <span>
+                                        <strong>Allocation: High to Low</strong>
+                                        <small>Largest share first</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="sort-dropdown-option" data-value="allocation-asc">
+                                    <span class="sort-option-icon">%↑</span>
+                                    <span>
+                                        <strong>Allocation: Low to High</strong>
+                                        <small>Smallest share first</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="sort-dropdown-option" data-value="name-asc">
+                                    <span class="sort-option-icon">A</span>
+                                    <span>
+                                        <strong>Name: A to Z</strong>
+                                        <small>Alphabetical order</small>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="sort-dropdown-option" data-value="name-desc">
+                                    <span class="sort-option-icon">Z</span>
+                                    <span>
+                                        <strong>Name: Z to A</strong>
+                                        <small>Reverse alphabetical order</small>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p id="portfolioStatus" class="portfolio-status">Showing 0 of 0 assets</p>
+            </div>
+
+            <div class="portfolio-header">
+                <span>Symbol</span>
+                <span>Name</span>
+                <span>Quantity</span>
+                <span>Buy Price</span>
+                <span>Current Price</span>
+                <span>Value</span>
+                <span>Profit / Loss</span>
+                <span>Allocation</span>
+                <span>Action</span>
+            </div>
+
+            <div id="portfolioList"></div>
+        </section>
+
+    </main>
+
+    <!-- ================================================== -->
+    <!-- BLOCK 09 — DELETE CONFIRM MODAL / ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ -->
+    <!-- ================================================== -->
+    <div id="deleteModal" class="delete-modal hidden">
+        <div class="delete-modal-box">
+            <div class="delete-modal-icon">!</div>
+
+            <div class="delete-modal-content">
+                <h3>Delete asset?</h3>
+                <p id="deleteModalText">Are you sure you want to delete this asset?</p>
+
+                <div class="delete-modal-actions">
+                    <button id="cancelDeleteBtn" class="delete-cancel-btn" type="button">Cancel</button>
+                    <button id="confirmDeleteBtn" class="delete-confirm-btn" type="button">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard JavaScript -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

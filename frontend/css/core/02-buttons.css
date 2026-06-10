@@ -1,0 +1,106 @@
+/* ==================================================
+   CORE 02 — COMMON BUTTONS / ОБЩИЕ СТИЛИ КНОПОК
+   Что здесь: базовые button, hover, disabled и маленькие action-кнопки.
+   Специальные кнопки навигации/portfolio/auth могут быть ниже в своих блоках.
+================================================== */
+
+/* ==================================================
+   BUTTONS
+================================================== */
+
+button {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: var(--green);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    background: var(--green-dark);
+    box-shadow: 0 10px 22px rgba(34, 197, 94, 0.18);
+}
+
+button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.header-actions button,
+.dashboard-header button {
+    width: auto;
+    padding: 10px 18px;
+    border-radius: 14px;
+}
+
+#refreshPricesBtn {
+    background: var(--blue);
+}
+
+#refreshPricesBtn:hover {
+    background: var(--blue-dark);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+}
+
+#logoutBtn {
+    background: var(--red);
+}
+
+#logoutBtn:hover,
+.delete-btn:hover {
+    background: var(--red-dark);
+    box-shadow: 0 10px 22px rgba(239, 68, 68, 0.18);
+}
+
+.action-buttons,
+.edit-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-buttons button,
+.edit-actions button {
+    width: auto;
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.edit-btn {
+    background: #3b82f6;
+}
+
+.edit-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 10px 22px rgba(59, 130, 246, 0.18);
+}
+
+.delete-btn {
+    background: var(--red);
+}
+
+#cancelEditBtn {
+    background: #6b7280;
+}
+
+#cancelEditBtn:hover {
+    background: #4b5563;
+}
+
+.edit-actions {
+    gap: 10px;
+}
+
+.edit-actions button {
+    min-width: 120px;
+}

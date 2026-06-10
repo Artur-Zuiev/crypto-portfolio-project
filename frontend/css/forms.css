@@ -1,0 +1,88 @@
+/* ==================================================
+   FORMS / INPUTS / MESSAGES
+================================================== */
+
+input,
+select {
+    width: 100%;
+    min-height: 48px;
+    margin-bottom: 14px;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    outline: none;
+    background: #374151;
+    color: white;
+    font-size: 15px;
+    transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #cbd5e1 50%),
+        linear-gradient(135deg, #cbd5e1 50%, transparent 50%);
+    background-position:
+        calc(100% - 20px) 20px,
+        calc(100% - 14px) 20px;
+    background-size:
+        6px 6px,
+        6px 6px;
+    background-repeat: no-repeat;
+}
+
+select option {
+    background: #334155;
+    color: #f9fafb;
+}
+
+input::placeholder {
+    color: #9ca3af;
+}
+
+input:focus,
+select:focus {
+    border-color: rgba(34, 197, 94, 0.7);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+    background: #475569;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#message,
+#addMessage,
+#editMessage {
+    min-height: 22px;
+    margin-top: 14px;
+    font-size: 15px;
+}
+
+#editMessage {
+    color: #facc15;
+}
+
+.edit-card {
+    padding: 20px;
+    background: #374151;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.edit-card h3 {
+    margin-top: 0;
+    margin-bottom: 18px;
+}
+
+.edit-card label {
+    display: block;
+    margin-bottom: 6px;
+    color: #9ca3af;
+    font-weight: 700;
+}

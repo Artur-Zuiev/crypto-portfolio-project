@@ -1,0 +1,235 @@
+/* ==================================================
+   BLOCK 03 — USER PROFILE CARD / КАРТОЧКА ПРОФИЛЯ
+   Что здесь: верхняя карточка пользователя: avatar, username, email,
+   Last price update.
+   Используется: dashboard.html → section.user-profile-card
+================================================== */
+
+/* ==================================================
+   FINAL OVERRIDE — USER PROFILE CARD
+   Красивый блок User / Email / Last update
+================================================== */
+
+.user-profile-card {
+    position: relative !important;
+    overflow: hidden !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 24px !important;
+
+    min-height: 126px !important;
+    padding: 24px 28px !important;
+
+    border-radius: 24px !important;
+    border: 1px solid rgba(96, 165, 250, 0.16) !important;
+
+    background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.24), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.12), transparent 32%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(20, 32, 54, 0.96) 52%, rgba(15, 23, 42, 0.94)) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 42px rgba(0, 0, 0, 0.26) !important;
+}
+
+.user-profile-card::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -70px !important;
+    right: 160px !important;
+
+    width: 180px !important;
+    height: 180px !important;
+
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.16), transparent 68%) !important;
+    pointer-events: none !important;
+}
+
+.user-profile-left {
+    position: relative !important;
+    z-index: 2 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 18px !important;
+
+    min-width: 0 !important;
+}
+
+.user-avatar {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 22px !important;
+
+    background:
+        linear-gradient(135deg, rgba(2, 78, 179, 0.76), rgba(21, 130, 180, 0.829)) !important;
+
+    border-color: rgba(96, 165, 250, 0.30) !important;
+
+    color: #ffffff !important;
+
+    font-size: 30px !important;
+    font-weight: 950 !important;
+    line-height: 1 !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 16px 30px rgba(37, 99, 235, 0.24) !important;
+}
+
+.user-profile-info {
+    min-width: 0 !important;
+}
+
+.user-profile-label {
+    display: inline-flex !important;
+    align-items: center !important;
+
+    margin-bottom: 8px !important;
+    padding: 6px 10px !important;
+
+    border-radius: 999px !important;
+    border: 1px solid rgba(96, 165, 250, 0.18) !important;
+
+    background: rgba(37, 99, 235, 0.12) !important;
+    color: #93c5fd !important;
+
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.2px !important;
+}
+
+.user-profile-info h2 {
+    margin: 0 !important;
+
+    color: #ffffff !important;
+    font-size: 28px !important;
+    font-weight: 950 !important;
+    line-height: 1.1 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.user-profile-info p {
+    margin: 7px 0 0 !important;
+
+    color: #a9bdd8 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.user-profile-right {
+    position: relative !important;
+    z-index: 2 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 14px !important;
+
+    flex-shrink: 0 !important;
+}
+
+
+.price-update-box {
+    min-width: 230px !important;
+    min-height: 64px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 6px !important;
+
+    padding: 12px 16px !important;
+
+    border-radius: 18px !important;
+    border: 1px solid rgba(96, 165, 250, 0.18) !important;
+
+    background:
+        linear-gradient(135deg, rgba(30, 41, 59, 0.82), rgba(15, 23, 42, 0.88)) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 12px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+.price-update-box span {
+    color: #94a3b8 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+.price-update-box strong {
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 950 !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+}
+
+/* Laptop */
+@media (max-width: 1000px) {
+    .user-profile-card {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+    }
+
+    .user-profile-right {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+
+    .price-update-box {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 620px) {
+    .user-profile-left {
+        width: 100% !important;
+        align-items: flex-start !important;
+    }
+
+    .user-avatar {
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+
+        border-radius: 18px !important;
+        font-size: 24px !important;
+    }
+
+    .user-profile-info h2 {
+        font-size: 23px !important;
+    }
+
+    .user-profile-right {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .user-status-pill,
+    .price-update-box {
+        width: 100% !important;
+    }
+}

@@ -1,0 +1,68 @@
+<!-- ==================================================
+   BLOCK 01 — DOCUMENT SETTINGS / НАСТРОЙКИ ДОКУМЕНТА
+================================================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Crypto Portfolio</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+    <!-- ==================================================
+    BLOCK 02 — AUTH CARD / КАРТОЧКА АВТОРИЗАЦИИ
+================================================== -->
+    <main class="auth-wrapper">
+        <section class="auth-card">
+
+            <div class="auth-brand">
+                <div class="auth-logo">CP</div>
+
+                <div>
+                    <p class="auth-eyebrow">Crypto Portfolio</p>
+                    <h1>Welcome back</h1>
+                    <p class="auth-subtitle">
+                        Login to continue managing your crypto portfolio.
+                    </p>
+                </div>
+            </div>
+Tn-User_12042004
+Tt-User_12042004
+            <!-- ==================================================
+            BLOCK 03 — AUTH FORM / ФОРМА ВХОДА ИЛИ РЕГИСТРАЦИИ
+================================================== -->
+            <form id="loginForm" class="auth-form">
+                <div class="auth-field">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" placeholder="youremail@gmail.com" autocomplete="email">
+                </div>
+
+                <div class="auth-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="auth-submit-btn">
+                    Login
+                </button>
+            </form>
+
+            <p id="message" class="auth-message"></p>
+
+            <p class="auth-switch">
+                No account?
+                <a href="register.html">Create account</a>
+            </p>
+
+        </section>
+    </main>
+
+    <!-- ==================================================
+    BLOCK 04 — JAVASCRIPT CONNECTION / ПОДКЛЮЧЕНИЕ JAVASCRIPT
+================================================== -->
+    <script src="js/auth.js"></script>
+    
+</body>
+</html>

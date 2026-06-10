@@ -1,0 +1,858 @@
+/* ==================================================
+   BLOCK 09 — MY PORTFOLIO LIST / СПИСОК КУПЛЕННЫХ МОНЕТ
+   Что здесь:
+   1) Portfolio card / карточка портфеля
+   2) Search + Sort controls / поиск и сортировка
+   3) Custom Sort Dropdown / кастомный выпадающий список
+   4) Portfolio table / таблица монет
+   5) Empty search state / состояние, когда поиск ничего не нашёл
+
+   Используется:
+   dashboard.html → .portfolio-card / .portfolio-top / #portfolioList
+================================================== */
+
+
+/* ==================================================
+   BLOCK 09.1 — PORTFOLIO CARD / КАРТОЧКА ПОРТФЕЛЯ
+================================================== */
+
+.portfolio-card {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    position: relative !important;
+    z-index: 10 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+
+    box-sizing: border-box !important;
+}
+
+.portfolio-top {
+    position: relative !important;
+    z-index: 200 !important;
+
+    display: block !important;
+    margin-bottom: 22px !important;
+
+    overflow: visible !important;
+}
+
+.portfolio-top h2 {
+    margin: 0 0 18px !important;
+}
+
+.portfolio-status {
+    margin: 14px 0 0 !important;
+
+    color: var(--muted) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+
+/* ==================================================
+   BLOCK 09.2 — SEARCH + SORT CONTROLS / ПОИСК И СОРТИРОВКА
+================================================== */
+
+.portfolio-controls {
+    position: relative !important;
+    z-index: 250 !important;
+
+    display: grid !important;
+    grid-template-columns: 440px 440px !important;
+    align-items: end !important;
+    gap: 18px !important;
+
+    width: fit-content !important;
+    max-width: 100% !important;
+
+    overflow: visible !important;
+}
+
+.portfolio-search,
+.portfolio-sort {
+    position: relative !important;
+
+    width: 440px !important;
+    max-width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    min-width: 0 !important;
+    overflow: visible !important;
+}
+
+.portfolio-sort {
+    z-index: 300 !important;
+}
+
+.portfolio-search label,
+.portfolio-sort label {
+    margin: 0 !important;
+
+    color: #a9bdd8 !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+}
+
+#searchPortfolio {
+    width: 100% !important;
+    height: 64px !important;
+    min-height: 64px !important;
+
+    margin-bottom: 0 !important;
+    padding: 0 18px !important;
+
+    border-radius: 18px !important;
+    border: 1px solid rgba(148, 163, 184, 0.22) !important;
+
+    background:
+        linear-gradient(135deg, rgba(51, 65, 85, 0.96), rgba(42, 55, 74, 0.92)) !important;
+
+    color: #f8fafc !important;
+
+    font-size: 18px !important;
+    font-weight: 700 !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 12px 26px rgba(0, 0, 0, 0.18) !important;
+
+    outline: none !important;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease,
+        transform 0.18s ease !important;
+}
+
+#searchPortfolio::placeholder {
+    color: #a9b8cc !important;
+    font-weight: 600 !important;
+}
+
+#searchPortfolio:focus {
+    border-color: rgba(96, 165, 250, 0.68) !important;
+
+    background:
+        linear-gradient(135deg, rgba(51, 65, 85, 1), rgba(29, 65, 143, 0.34)) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.14),
+        0 18px 36px rgba(37, 99, 235, 0.14) !important;
+}
+
+
+/* ==================================================
+   BLOCK 09.3 — CUSTOM SORT DROPDOWN / КАСТОМНЫЙ DROPDOWN
+================================================== */
+
+.native-sort-select {
+    display: none !important;
+}
+
+.sort-dropdown {
+    position: relative !important;
+    z-index: 9999 !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.sort-dropdown-toggle {
+    width: 100% !important;
+    height: 64px !important;
+    min-height: 64px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+
+    padding: 10px 18px !important;
+
+    border-radius: 18px !important;
+    border: 1px solid rgba(96, 165, 250, 0.30) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.88), rgba(26, 103, 139, 0.72)) !important;
+
+    color: #f8fafc !important;
+    cursor: pointer !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 14px 28px rgba(0, 0, 0, 0.24) !important;
+
+    outline: none !important;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease !important;
+}
+
+.sort-dropdown-toggle:hover,
+.sort-dropdown.open .sort-dropdown-toggle {
+    transform: translateY(-1px) !important;
+
+    border-color: rgba(96, 165, 250, 0.55) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.92), rgba(26, 103, 139, 0.78)) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.12),
+        0 18px 38px rgba(37, 99, 235, 0.16) !important;
+}
+
+.sort-dropdown-toggle:focus,
+.sort-dropdown-toggle:focus-visible {
+    outline: none !important;
+}
+
+.sort-dropdown-toggle * {
+    pointer-events: none !important;
+}
+
+.sort-dropdown-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+
+    min-width: 0 !important;
+}
+
+.sort-dropdown-left div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+
+    min-width: 0 !important;
+}
+
+.sort-dropdown-left strong {
+    max-width: 310px !important;
+
+    color: #ffffff !important;
+    font-size: 18px !important;
+    font-weight: 950 !important;
+    line-height: 1.1 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.sort-dropdown-left small {
+    max-width: 310px !important;
+
+    margin-top: 4px !important;
+
+    color: #b7c9e6 !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.sort-dropdown-icon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 15px !important;
+
+    background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(14, 116, 144, 0.88)) !important;
+
+    color: #ffffff !important;
+
+    font-size: 17px !important;
+    font-weight: 950 !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        0 10px 20px rgba(59, 130, 246, 0.22) !important;
+}
+
+.sort-dropdown-arrow {
+    display: none !important;
+}
+
+.sort-dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 12px) !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+    max-height: 380px !important;
+
+    display: none !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    padding: 10px !important;
+
+    border-radius: 20px !important;
+    border: 1px solid rgba(96, 165, 250, 0.24) !important;
+
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.99), rgba(20, 31, 50, 0.99)) !important;
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.58),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+
+    -webkit-backdrop-filter: blur(16px) !important;
+    backdrop-filter: blur(16px) !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    pointer-events: auto !important;
+    overscroll-behavior: contain !important;
+
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(59, 130, 246, 0.75) rgba(15, 23, 42, 0.75) !important;
+
+    z-index: 99999 !important;
+}
+
+.sort-dropdown.open .sort-dropdown-menu {
+    display: flex !important;
+}
+
+.sort-dropdown-option {
+    width: 100% !important;
+    min-height: 72px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+
+    padding: 12px 14px !important;
+
+    border: 1px solid rgba(148, 163, 184, 0.10) !important;
+    border-radius: 16px !important;
+
+    background:
+        linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.92)) !important;
+
+    color: #f8fafc !important;
+    cursor: pointer !important;
+    text-align: left !important;
+
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease,
+        transform 0.16s ease,
+        box-shadow 0.16s ease !important;
+}
+
+.sort-dropdown-option:hover {
+    transform: translateX(3px) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.58), rgba(26, 103, 139, 0.42)) !important;
+
+    border-color: rgba(96, 165, 250, 0.30) !important;
+
+    box-shadow:
+        0 5px 12px rgba(29, 79, 187, 0.22) !important;
+}
+
+.sort-dropdown-option.active {
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.88), rgba(26, 103, 139, 0.62)) !important;
+
+    border-color: rgba(96, 165, 250, 0.40) !important;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(96, 165, 250, 0.12),
+        0 10px 24px rgba(37, 99, 235, 0.12) !important;
+}
+
+.sort-option-icon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 15px !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.70), rgba(26, 103, 139, 0.44)) !important;
+
+    color: #bfdbfe !important;
+
+    font-size: 15px !important;
+    font-weight: 950 !important;
+}
+
+.sort-dropdown-option.active .sort-option-icon {
+    background:
+        linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(37, 99, 235, 0.92)) !important;
+
+    color: #ffffff !important;
+}
+
+.sort-dropdown-option span:last-child {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+
+    min-width: 0 !important;
+}
+
+.sort-dropdown-option strong {
+    color: #ffffff !important;
+    font-size: 17px !important;
+    font-weight: 950 !important;
+    line-height: 1.12 !important;
+}
+
+.sort-dropdown-option small {
+    margin-top: 4px !important;
+
+    color: #a9bdd8 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+}
+
+.sort-dropdown-menu::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+.sort-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.75) !important;
+    border-radius: 999px !important;
+}
+
+.sort-dropdown-menu::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(180deg, rgba(59, 130, 246, 0.75), rgba(14, 165, 233, 0.55)) !important;
+
+    border-radius: 999px !important;
+}
+
+.sort-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background:
+        linear-gradient(180deg, rgba(96, 165, 250, 0.95), rgba(56, 189, 248, 0.75)) !important;
+}
+
+
+/* ==================================================
+   BLOCK 09.4 — PORTFOLIO TABLE / ТАБЛИЦА ПОРТФЕЛЯ
+================================================== */
+
+:root {
+    --portfolio-grid-columns:
+        82px                  /* Symbol */
+        minmax(120px, 1fr)    /* Name */
+        78px                  /* Quantity */
+        minmax(105px, 0.85fr) /* Buy Price */
+        minmax(115px, 0.9fr)  /* Current Price */
+        minmax(105px, 0.85fr) /* Value */
+        minmax(115px, 0.9fr)  /* Profit / Loss */
+        100px                 /* Allocation */
+        132px;                /* Action */
+}
+
+.portfolio-header,
+.portfolio-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: var(--portfolio-grid-columns) !important;
+    align-items: center !important;
+    column-gap: 8px !important;
+
+    box-sizing: border-box !important;
+}
+
+.portfolio-header {
+    position: relative !important;
+    z-index: 1 !important;
+
+    margin-top: 24px !important;
+    padding: 0 14px 12px !important;
+
+    color: #bfd2ee !important;
+    font-size: 13px !important;
+    font-weight: 950 !important;
+    line-height: 1.15 !important;
+}
+
+#portfolioList {
+    position: relative !important;
+    z-index: 1 !important;
+
+    min-height: 330px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+
+    margin-top: 4px !important;
+}
+
+.portfolio-item {
+    min-height: 82px !important;
+
+    margin-bottom: 0 !important;
+    padding: 14px 14px !important;
+
+    border-radius: 20px !important;
+    border: 1px solid rgba(96, 165, 250, 0.14) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.32), rgba(15, 23, 42, 0.96) 45%, rgba(26, 103, 139, 0.24)) !important;
+
+    color: #f8fafc !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 16px 34px rgba(0, 0, 0, 0.22) !important;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease !important;
+}
+
+.portfolio-item:hover {
+    transform: translateY(-2px) !important;
+
+    border-color: rgba(96, 165, 250, 0.32) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.48), rgba(15, 23, 42, 0.96) 45%, rgba(26, 103, 139, 0.36)) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        0 22px 44px rgba(0, 0, 0, 0.34),
+        0 0 0 1px rgba(96, 165, 250, 0.06) !important;
+}
+
+.portfolio-header > *,
+.portfolio-item > * {
+    min-width: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    box-sizing: border-box !important;
+}
+
+.portfolio-header > *:nth-child(2),
+.portfolio-item > *:nth-child(2) {
+    justify-content: flex-start !important;
+    text-align: left !important;
+}
+
+.portfolio-item > span {
+    color: #f8fafc !important;
+    font-size: 15px !important;
+    font-weight: 850 !important;
+}
+
+.portfolio-item > *:nth-child(2) {
+    font-size: 16px !important;
+    font-weight: 950 !important;
+}
+
+.portfolio-item > *:nth-child(4),
+.portfolio-item > *:nth-child(5),
+.portfolio-item > *:nth-child(6),
+.portfolio-item > *:nth-child(7),
+.portfolio-item .profit,
+.portfolio-item .loss {
+    white-space: nowrap !important;
+}
+
+.portfolio-item .profit {
+    color: #22c55e !important;
+    font-weight: 950 !important;
+}
+
+.portfolio-item .loss {
+    color: #ff4d5a !important;
+    font-weight: 950 !important;
+}
+
+.portfolio-item .profit,
+.portfolio-item .loss {
+    display: inline-flex !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+
+/* ---------- Badges / Значки ---------- */
+
+.portfolio-item .coin-symbol,
+.portfolio-item .allocation-badge {
+    width: fit-content !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    border-radius: 999px !important;
+    font-weight: 950 !important;
+}
+
+.portfolio-item .coin-symbol {
+    min-width: 60px !important;
+    height: 38px !important;
+
+    padding: 0 12px !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.95), rgba(26, 103, 139, 0.82)) !important;
+
+    color: #dbeafe !important;
+
+    font-size: 15px !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.10),
+        0 10px 22px rgba(37, 99, 235, 0.16) !important;
+}
+
+.portfolio-item .allocation-badge {
+    min-width: 72px !important;
+    height: 38px !important;
+
+    padding: 0 10px !important;
+
+    background:
+        linear-gradient(135deg, rgba(20, 44, 95, 0.72), rgba(19, 74, 100, 0.5)) !important;
+
+    color: #bfdbfe !important;
+
+    font-size: 15px !important;
+
+    border: 1px solid rgba(96, 165, 250, 0.16) !important;
+}
+
+
+/* ---------- Action buttons / Кнопки действий ---------- */
+
+.portfolio-item .action-buttons {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+
+    text-align: center !important;
+}
+
+.portfolio-item .edit-btn,
+.portfolio-item .delete-btn {
+    height: 38px !important;
+
+    padding: 0 10px !important;
+
+    border-radius: 14px !important;
+
+    font-size: 13px !important;
+    font-weight: 900 !important;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease,
+        color 0.18s ease !important;
+}
+
+.portfolio-item .edit-btn {
+    min-width: 54px !important;
+
+    border: 1px solid rgba(96, 165, 250, 0.28) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.95), rgba(26, 103, 139, 0.753)) !important;
+
+    color: #ffffff !important;
+}
+
+.portfolio-item .delete-btn {
+    min-width: 64px !important;
+
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+
+    background:
+        linear-gradient(135deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.96)) !important;
+
+    color: #cbd5e1 !important;
+
+    box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.portfolio-item .edit-btn:hover {
+    transform: translateY(-2px) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.63), rgba(26, 103, 139, 0.555)) !important;
+}
+
+.portfolio-item .delete-btn:hover {
+    transform: translateY(-2px) !important;
+
+    border-color: rgba(248, 113, 113, 0.45) !important;
+
+    background:
+        linear-gradient(135deg, rgba(127, 29, 29, 0.50), rgba(15, 23, 42, 0.96)) !important;
+
+    color: #ffffff !important;
+}
+
+
+/* ==================================================
+   BLOCK 09.5 — EMPTY SEARCH STATE / ЕСЛИ ПОИСК НИЧЕГО НЕ НАШЁЛ
+================================================== */
+
+.portfolio-empty-search {
+    min-height: 240px !important;
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 18px !important;
+
+    padding: 34px 28px !important;
+    margin-top: 8px !important;
+
+    border-radius: 22px !important;
+    border: 1px solid rgba(96, 165, 250, 0.18) !important;
+
+    background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.22), transparent 34%),
+        linear-gradient(135deg, rgba(29, 65, 143, 0.20), rgba(15, 23, 42, 0.96) 52%, rgba(26, 103, 139, 0.18)) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 18px 40px rgba(0, 0, 0, 0.22) !important;
+}
+
+.portfolio-empty-icon {
+    width: 62px !important;
+    height: 62px !important;
+    min-width: 62px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 20px !important;
+
+    background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.90), rgba(14, 116, 144, 0.78)) !important;
+
+    color: #ffffff !important;
+    font-size: 34px !important;
+    font-weight: 900 !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        0 14px 28px rgba(37, 99, 235, 0.22) !important;
+}
+
+.portfolio-empty-content {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.portfolio-empty-content h3 {
+    margin: 0 !important;
+
+    color: #ffffff !important;
+    font-size: 24px !important;
+    font-weight: 950 !important;
+    line-height: 1.1 !important;
+}
+
+.portfolio-empty-content p {
+    margin: 0 !important;
+
+    color: #a9bdd8 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+}
+
+
+/* ==================================================
+   BLOCK 09.6 — RESPONSIVE / АДАПТАЦИЯ
+================================================== */
+
+@media (max-width: 1150px) {
+    .portfolio-card {
+        overflow-x: hidden !important;
+    }
+
+    .portfolio-header,
+    .portfolio-item {
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .portfolio-controls {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+    }
+
+    .portfolio-search,
+    .portfolio-sort {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 700px) {
+    #portfolioList {
+        min-height: 260px !important;
+    }
+
+    .portfolio-empty-search {
+        min-height: 220px !important;
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+}

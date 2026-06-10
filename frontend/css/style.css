@@ -1,0 +1,41 @@
+/* ==================================================
+   STYLE.CSS — MAIN CSS MAP / ГЛАВНАЯ КАРТА CSS
+   Здесь нет обычных стилей. Этот файл только подключает CSS-блоки.
+   Если хочешь изменить конкретную часть сайта — открывай нужный файл ниже.
+================================================== */
+
+/* ==================================================
+   CORE / ОСНОВА
+   Переменные, reset, body, общие поля, общие кнопки
+================================================== */
+@import url("./core/00-base.css");
+@import url("./core/01-forms.css");
+@import url("./core/02-buttons.css");
+
+/* ==================================================
+   DASHBOARD PAGE / СТРАНИЦА DASHBOARD
+   Блоки идут в том же порядке, как они расположены на странице
+================================================== */
+@import url("./blocks/01-dashboard-layout.css");
+@import url("./blocks/02-navigation.css");
+@import url("./blocks/03-user-profile-card.css");
+@import url("./blocks/04-summary-cards.css");
+@import url("./blocks/05-add-transaction-form.css");
+@import url("./blocks/06-crypto-dropdown.css");
+@import url("./blocks/07-transactions.css");
+@import url("./blocks/08-allocation.css");
+@import url("./blocks/09-portfolio-list.css");
+@import url("./blocks/10-portfolio-filters-sort.css");
+@import url("./blocks/11-edit-card.css");
+@import url("./blocks/12-delete-modal.css");
+
+/* ==================================================
+   AUTH PAGES / СТРАНИЦЫ ВХОДА И РЕГИСТРАЦИИ
+================================================== */
+@import url("./blocks/13-auth-pages.css");
+
+/* ==================================================
+   RESPONSIVE / АДАПТАЦИЯ ПОД НОУТБУК, ПЛАНШЕТ, ТЕЛЕФОН
+   Должен быть последним, чтобы спокойно переопределять блоки выше.
+================================================== */
+@import url("./blocks/99-responsive.css");

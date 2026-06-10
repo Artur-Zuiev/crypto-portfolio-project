@@ -1,0 +1,130 @@
+/* ==================================================
+   BLOCK 12 — DELETE CONFIRM MODAL / ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ
+================================================== */
+
+.delete-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+    background: rgba(2, 6, 23, 0.74);
+    backdrop-filter: blur(12px);
+}
+
+.delete-modal.hidden {
+    display: none;
+}
+
+.delete-modal-box {
+    width: min(440px, 100%);
+
+    display: flex;
+    gap: 18px;
+
+    padding: 24px;
+    border-radius: 26px;
+
+    background:
+        radial-gradient(circle at top left, rgba(239, 68, 68, 0.18), transparent 36%),
+        linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+}
+
+.delete-modal-icon {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+    background: rgba(239, 68, 68, 0.16);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+
+    color: #fca5a5;
+    font-size: 22px;
+    font-weight: 950;
+}
+
+.delete-modal-content {
+    flex: 1;
+}
+
+.delete-modal-content h3 {
+    margin: 0 0 8px;
+
+    color: #f8fafc;
+    font-size: 22px;
+    font-weight: 950;
+    letter-spacing: -0.03em;
+}
+
+.delete-modal-content p {
+    margin: 0 0 22px;
+
+    color: #cbd5e1;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.delete-cancel-btn,
+.delete-confirm-btn {
+    min-width: 104px;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 18px;
+
+    font-size: 14px;
+    font-weight: 900;
+
+    cursor: pointer;
+    transition: transform 0.18s ease, filter 0.18s ease, background 0.18s ease;
+}
+
+.delete-cancel-btn {
+    color: #cbd5e1;
+    background: rgba(30, 41, 59, 0.96);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.delete-confirm-btn {
+    color: #ffffff;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    box-shadow: 0 12px 28px rgba(239, 68, 68, 0.24);
+}
+
+.delete-cancel-btn:hover,
+.delete-confirm-btn:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.08);
+    background: linear-gradient(135deg, #ef4444cb, #b91c1cce);
+    box-shadow: 0 12px 28px rgba(219, 35, 35, 0.329);
+}
+
+.delete-cancel-btn:hover {
+    background: rgb(40, 55, 78);
+    box-shadow: 0 12px 28px rgba(88, 77, 77, 0.24);
+}
+
+
+
+.delete-confirm-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+}

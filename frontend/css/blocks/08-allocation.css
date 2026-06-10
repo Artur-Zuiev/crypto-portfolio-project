@@ -1,0 +1,109 @@
+/* ==================================================
+   BLOCK 08 — PORTFOLIO ALLOCATION / РАСПРЕДЕЛЕНИЕ ПОРТФЕЛЯ
+   Что здесь: карточка Portfolio Allocation, строки распределения,
+   coin badge, процент, progress bar.
+   Используется: dashboard.html → .allocation-card
+================================================== */
+
+/* ==================================================
+   FINAL OVERRIDE — ALLOCATION FIX
+================================================== */
+
+.allocation-card {
+    display: block !important;
+    margin: 0 0 24px !important;
+    padding: 28px !important;
+
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+.allocation-card h2 {
+    margin: 0 0 22px !important;
+    color: var(--text) !important;
+    font-size: 26px !important;
+    font-weight: 900 !important;
+}
+
+.allocation-chart {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+}
+
+.allocation-row {
+    display: block !important;
+    width: 100% !important;
+
+    padding: 16px 18px !important;
+    margin: 0 !important;
+
+    background: rgba(55, 65, 81, 0.72) !important;
+    border: 1px solid rgba(148, 163, 184, 0.14) !important;
+    border-radius: 16px !important;
+}
+
+.allocation-info {
+    display: grid !important;
+    grid-template-columns: 72px 1fr auto !important;
+    align-items: center !important;
+    gap: 12px !important;
+
+    width: 100% !important;
+    min-height: 38px !important;
+    margin: 0 0 12px !important;
+}
+
+.allocation-info .coin-symbol {
+    width: 64px !important;
+    min-width: 64px !important;
+    height: 34px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 12px !important;
+    margin: 0 !important;
+
+    border-radius: 999px !important;
+    background: rgba(34, 197, 94, 0.14) !important;
+    color: #86efac !important;
+
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+.allocation-name {
+    color: #cbd5e1 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+.allocation-percent {
+    color: #93c5fd !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+}
+
+.allocation-track {
+    display: block !important;
+    width: 100% !important;
+    height: 10px !important;
+
+    overflow: hidden !important;
+    background: rgba(15, 23, 42, 0.75) !important;
+    border-radius: 999px !important;
+}
+
+.allocation-fill {
+    display: block !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, var(--blue), var(--green)) !important;
+    border-radius: 999px !important;
+}

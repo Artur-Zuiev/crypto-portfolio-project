@@ -1,0 +1,598 @@
+/* ==================================================
+   BLOCK 06 — CRYPTO DROPDOWN / ВЫБОР КРИПТЫ
+   Что здесь: кастомный выбор купленной/продаваемой монеты,
+   список BTC/ETH/SOL/ADA/BNB, BUY/SELL цвета, scrollbar меню.
+   Используется: dashboard.html → #cryptoDropdown
+================================================== */
+
+/* ==================================================
+   FINAL OVERRIDE — CUSTOM CRYPTO DROPDOWN
+   Browser-independent select replacement
+================================================== */
+
+/* Real select stays in DOM for JS/backend, but user does not see it */
+.native-crypto-select {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 1px !important;
+    height: 1px !important;
+}
+
+/* Dropdown wrapper */
+.crypto-dropdown {
+    position: relative !important;
+    width: 100% !important;
+    z-index: 50 !important;
+}
+
+/* Closed dropdown button */
+.crypto-dropdown-toggle {
+    width: 100% !important;
+    min-height: 52px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+
+    padding: 10px 16px !important;
+
+    border: 1px solid rgba(34, 197, 94, 0.42) !important;
+    border-radius: 15px !important;
+
+    background:
+        linear-gradient(135deg, rgba(51, 65, 85, 0.94), rgba(30, 41, 59, 0.88)) !important;
+
+    color: #ffffff !important;
+    cursor: pointer !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 10px 22px rgba(0, 0, 0, 0.18) !important;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease,
+        background 0.18s ease !important;
+}
+
+.crypto-dropdown-toggle:hover {
+    border-color: rgba(34, 197, 94, 0.72) !important;
+    transform: translateY(-1px) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 14px 28px rgba(0, 0, 0, 0.24) !important;
+}
+
+.crypto-dropdown.open .crypto-dropdown-toggle {
+    border-color: rgba(56, 189, 248, 0.9) !important;
+    box-shadow:
+        0 0 0 4px rgba(56, 189, 248, 0.12),
+        0 16px 32px rgba(0, 0, 0, 0.26) !important;
+}
+
+.crypto-dropdown-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-width: 0 !important;
+}
+
+.crypto-dropdown-left strong {
+    display: block !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    line-height: 1.1 !important;
+}
+
+.crypto-dropdown-left small {
+    display: block !important;
+    margin-top: 3px !important;
+    color: #a9c7e8 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+/* Icon in selected value */
+.crypto-dropdown-icon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 12px !important;
+
+    background:
+        linear-gradient(135deg, rgba(56, 189, 248, 0.24), rgba(124, 58, 237, 0.22)) !important;
+
+    color: #e0f2fe !important;
+
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.2px !important;
+}
+
+.crypto-dropdown-arrow {
+    color: #cbd5e1 !important;
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    transition: transform 0.18s ease !important;
+    transform: rotate(180deg) !important;
+}
+
+.crypto-dropdown.open .crypto-dropdown-arrow {
+    transform: rotate(0deg) !important;
+}
+
+/* Dropdown menu */
+.crypto-dropdown-menu {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: calc(100% + 8px) !important;
+
+    display: none !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+
+    max-height: 260px !important;
+    overflow-y: auto !important;
+
+    padding: 8px !important;
+
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    border-radius: 18px !important;
+
+    background:
+        linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96)) !important;
+
+    box-shadow:
+        0 22px 45px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+
+    -webkit-backdrop-filter: blur(18px) !important;
+    backdrop-filter: blur(18px) !important;
+}
+
+.crypto-dropdown.open .crypto-dropdown-menu {
+    display: flex !important;
+}
+
+/* Dropdown option */
+.crypto-dropdown-option {
+    width: 100% !important;
+    min-height: 54px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+
+    padding: 10px 12px !important;
+
+    border: 1px solid transparent !important;
+    border-radius: 14px !important;
+
+    background: transparent !important;
+    color: #ffffff !important;
+
+    cursor: pointer !important;
+    text-align: left !important;
+
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease,
+        transform 0.16s ease !important;
+}
+
+.crypto-dropdown-option:hover {
+    background: rgba(56, 189, 248, 0.09) !important;
+    border-color: rgba(56, 189, 248, 0.22) !important;
+    transform: translateX(2px) !important;
+}
+
+.crypto-dropdown-option.active {
+    background:
+        linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(56, 189, 248, 0.10)) !important;
+    border-color: rgba(34, 197, 94, 0.35) !important;
+}
+
+.crypto-dropdown-option strong {
+    display: block !important;
+    color: #f8fafc !important;
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    line-height: 1.1 !important;
+}
+
+.crypto-dropdown-option small {
+    display: block !important;
+    margin-top: 3px !important;
+    color: #94a3b8 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+/* Coin icons */
+.crypto-option-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 13px !important;
+
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.2px !important;
+}
+
+.crypto-option-icon.btc {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(146, 64, 14, 0.24)) !important;
+    color: #fde68a !important;
+}
+
+.crypto-option-icon.eth {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.30), rgba(30, 64, 175, 0.25)) !important;
+    color: #c7d2fe !important;
+}
+
+.crypto-option-icon.sol {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.28), rgba(124, 58, 237, 0.22)) !important;
+    color: #99f6e4 !important;
+}
+
+.crypto-option-icon.ada {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.30), rgba(14, 165, 233, 0.20)) !important;
+    color: #bfdbfe !important;
+}
+
+.crypto-option-icon.bnb {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.28), rgba(202, 138, 4, 0.20)) !important;
+    color: #fef08a !important;
+}
+
+/* Selected icon colors */
+.crypto-dropdown-icon.btc {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.34), rgba(146, 64, 14, 0.26)) !important;
+    color: #fde68a !important;
+}
+
+.crypto-dropdown-icon.eth {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.34), rgba(30, 64, 175, 0.26)) !important;
+    color: #c7d2fe !important;
+}
+
+.crypto-dropdown-icon.sol {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.32), rgba(124, 58, 237, 0.24)) !important;
+    color: #99f6e4 !important;
+}
+
+.crypto-dropdown-icon.ada {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.34), rgba(14, 165, 233, 0.22)) !important;
+    color: #bfdbfe !important;
+}
+
+.crypto-dropdown-icon.bnb {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.32), rgba(202, 138, 4, 0.22)) !important;
+    color: #fef08a !important;
+}
+
+/* ==================================================
+   SCROLLBAR WITH CLEAN UP / DOWN ARROWS
+   Скролл меню со стрелками вверх/вниз
+================================================== */
+
+.crypto-dropdown-menu::-webkit-scrollbar {
+    width: 13px !important;
+}
+
+.crypto-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.9) !important;
+}
+
+.crypto-dropdown-menu::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #196a8d, #0739a3b9) !important;
+    border-radius: 999px !important;
+    border: 3px solid rgb(15, 23, 42) !important;
+}
+
+.crypto-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #116d91, #084997) !important;
+}
+
+/* Верхняя кнопка */
+.crypto-dropdown-menu::-webkit-scrollbar-button:single-button:vertical:decrement {
+    height: 18px !important;
+    width: 12px !important;
+
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 3L10 8H2L6 3Z' fill='%2393c5bd'/%3E%3C/svg%3E")
+        center / 10px 10px no-repeat !important;
+}
+
+/* Нижняя кнопка */
+.crypto-dropdown-menu::-webkit-scrollbar-button:single-button:vertical:increment {
+    height: 18px !important;
+    width: 12px !important;
+
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 9L2 4H10L6 9Z' fill='%2393c5bd'/%3E%3C/svg%3E")
+        center / 10px 10px no-repeat !important;
+}
+
+/* Sell mode border changes */
+#addCryptoForm.sell-mode .crypto-dropdown-toggle {
+    border-color: rgba(248, 113, 113, 0.46) !important;
+}
+
+#addCryptoForm.sell-mode .crypto-dropdown.open .crypto-dropdown-toggle {
+    border-color: rgba(248, 113, 113, 0.86) !important;
+    box-shadow:
+        0 0 0 4px rgba(239, 68, 68, 0.13),
+        0 16px 32px rgba(0, 0, 0, 0.26) !important;
+}
+
+#addCryptoForm.sell-mode .crypto-dropdown-option.active {
+    background:
+        linear-gradient(135deg, rgba(239, 68, 68, 0.16), rgba(56, 189, 248, 0.08)) !important;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+@media (max-width: 760px) {
+    .crypto-dropdown-toggle {
+        min-height: 50px !important;
+    }
+
+    .crypto-dropdown-menu {
+        max-height: 230px !important;
+    }
+}
+/* ==================================================
+   FINAL FIX — CLEAN NUMBER FIELDS + SELL DROPDOWN COLORS
+================================================== */
+
+/* Убираем лишние подписи под Quantity и Price */
+#addCryptoForm .field-help {
+    display: none !important;
+}
+
+/* Делаем поля Quantity / Price визуально чище */
+#addCryptoForm .transaction-field {
+    gap: 6px !important;
+}
+
+/* Labels над input чуть аккуратнее */
+#addCryptoForm .transaction-field .form-label {
+    margin-bottom: 2px !important;
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+}
+
+/* Inputs после удаления helper-text можно сделать чуть ниже */
+#addCryptoForm input {
+    height: 46px !important;
+    min-height: 46px !important;
+}
+
+/* Уменьшаем расстояние между Quantity/Price и Total */
+.transaction-form-grid {
+    gap: 10px 16px !important;
+}
+/* ==================================================
+   FINAL FIX — SELL DROPDOWN WITHOUT GREEN + NICE HELPER TEXT
+   Вставить в самый низ style.css
+================================================== */
+
+/* ------------------------------
+   1) Возвращаем красивые подсказки под input
+------------------------------ */
+#addCryptoForm .field-help {
+    display: block !important;
+    margin: 4px 0 0 !important;
+    padding-left: 2px !important;
+
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+
+    color: #8fa6c3 !important;
+    opacity: 0.95 !important;
+}
+
+#addCryptoForm.buy-mode .field-help {
+    color: #9cc7f3 !important;
+}
+
+#addCryptoForm.sell-mode .field-help {
+    color: #f0b1b1 !important;
+}
+
+/* Чуть аккуратнее расстояния в числовых полях */
+#addCryptoForm .transaction-field {
+    gap: 6px !important;
+}
+
+#addCryptoForm .transaction-field .form-label {
+    margin: 0 0 2px !important;
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+}
+
+#addCryptoForm input {
+    margin-bottom: 0 !important;
+}
+
+/* ------------------------------
+   2) Делаем dropdown плотнее и чище
+------------------------------ */
+.crypto-dropdown {
+    position: relative !important;
+    z-index: 200 !important;
+}
+
+.crypto-dropdown-menu {
+    z-index: 500 !important;
+    padding: 10px !important;
+    gap: 8px !important;
+
+    background:
+        linear-gradient(180deg, rgba(10, 17, 30, 0.99), rgba(18, 28, 45, 0.98)) !important;
+
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    box-shadow:
+        0 24px 44px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Убираем прозрачность у строк, чтобы не пробивалась зелень снизу */
+.crypto-dropdown-option {
+    min-height: 58px !important;
+
+    background: rgba(15, 23, 42, 0.94) !important;
+    border: 1px solid rgba(148, 163, 184, 0.08) !important;
+    border-radius: 15px !important;
+
+    box-shadow: none !important;
+}
+
+.crypto-dropdown-option:hover {
+    background: rgba(30, 41, 59, 0.96) !important;
+    border-color: rgba(56, 189, 248, 0.22) !important;
+    transform: translateX(2px) !important;
+}
+
+.crypto-dropdown-option strong {
+    font-size: 14px !important;
+    line-height: 1.05 !important;
+}
+
+.crypto-dropdown-option small {
+    margin-top: 4px !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+}
+
+/* ------------------------------
+   3) BUY mode — оставляем красивый зелёно-синий стиль
+------------------------------ */
+#addCryptoForm.buy-mode .crypto-dropdown-toggle {
+    border-color: rgba(34, 197, 94, 0.48) !important;
+}
+
+#addCryptoForm.buy-mode .crypto-dropdown.open .crypto-dropdown-toggle {
+    border-color: rgba(34, 197, 94, 0.72) !important;
+    box-shadow:
+        0 0 0 4px rgba(34, 197, 94, 0.10),
+        0 16px 32px rgba(0, 0, 0, 0.26) !important;
+}
+
+#addCryptoForm.buy-mode .crypto-dropdown-option.active {
+    background:
+        linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(56, 189, 248, 0.10)) !important;
+    border-color: rgba(34, 197, 94, 0.35) !important;
+}
+
+/* ------------------------------
+   4) SELL mode — полностью убираем зелёную подсветку
+------------------------------ */
+#addCryptoForm.sell-mode .crypto-dropdown-toggle {
+    border-color: rgba(248, 113, 113, 0.55) !important;
+    background:
+        linear-gradient(135deg, rgba(51, 65, 85, 0.95), rgba(45, 28, 38, 0.90)) !important;
+}
+
+#addCryptoForm.sell-mode .crypto-dropdown-toggle:hover {
+    border-color: rgba(248, 113, 113, 0.85) !important;
+    box-shadow:
+        0 0 0 4px rgba(239, 68, 68, 0.10),
+        0 14px 28px rgba(0, 0, 0, 0.24) !important;
+}
+
+#addCryptoForm.sell-mode .crypto-dropdown.open .crypto-dropdown-toggle {
+    border-color: rgba(248, 113, 113, 0.92) !important;
+    box-shadow:
+        0 0 0 4px rgba(239, 68, 68, 0.14),
+        0 16px 32px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* Само выпадающее меню в SELL */
+#addCryptoForm.sell-mode .crypto-dropdown-menu {
+    background:
+        linear-gradient(180deg, rgba(24, 16, 24, 0.99), rgba(15, 22, 38, 0.98)) !important;
+    border-color: rgba(248, 113, 113, 0.20) !important;
+}
+
+/* Каждая строка в SELL — без зелени */
+#addCryptoForm.sell-mode .crypto-dropdown-option {
+    background:
+        linear-gradient(135deg, rgba(20, 24, 39, 0.96), rgba(34, 22, 30, 0.92)) !important;
+    border-color: rgba(248, 113, 113, 0.08) !important;
+}
+
+/* Hover в SELL */
+#addCryptoForm.sell-mode .crypto-dropdown-option:hover {
+    background:
+        linear-gradient(135deg, rgba(74, 27, 37, 0.44), rgba(42, 24, 39, 0.92)) !important;
+    border-color: rgba(248, 113, 113, 0.28) !important;
+    transform: translateX(2px) !important;
+}
+
+/* Active selected option в SELL */
+#addCryptoForm.sell-mode .crypto-dropdown-option.active {
+    background:
+        linear-gradient(135deg, rgba(127, 29, 29, 0.46), rgba(76, 29, 149, 0.18)) !important;
+    border-color: rgba(248, 113, 113, 0.42) !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(248, 113, 113, 0.14),
+        0 0 0 1px rgba(248, 113, 113, 0.06) !important;
+}
+
+/* В SELL иконки выбранной/hover строки тоже красноватые */
+#addCryptoForm.sell-mode .crypto-dropdown-option:hover .crypto-option-icon,
+#addCryptoForm.sell-mode .crypto-dropdown-option.active .crypto-option-icon,
+#addCryptoForm.sell-mode .crypto-dropdown-icon,
+#addCryptoForm.sell-mode .crypto-dropdown-icon.btc,
+#addCryptoForm.sell-mode .crypto-dropdown-icon.eth,
+#addCryptoForm.sell-mode .crypto-dropdown-icon.sol,
+#addCryptoForm.sell-mode .crypto-dropdown-icon.ada,
+#addCryptoForm.sell-mode .crypto-dropdown-icon.bnb {
+    background:
+        linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(127, 29, 29, 0.22)) !important;
+    color: #ffe2e2 !important;
+}
+
+/* Текст стрелки */
+#addCryptoForm.sell-mode .crypto-dropdown-arrow {
+    color: #fecaca !important;
+}
+
+/* Скролл в SELL тоже красноватый */
+#addCryptoForm.sell-mode .crypto-dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(248, 113, 113, 0.35) !important;
+}
+
+#addCryptoForm.sell-mode .crypto-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(248, 113, 113, 0.52) !important;
+}
+
+/* ==================================================
+   BLOCK 06.9 — STRAIGHT RIGHT BORDER
+   Правый край crypto select делаем прямым
+================================================== */
+
+.crypto-dropdown-trigger,
+.crypto-dropdown-menu,
+.crypto-dropdown-list {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 3px !important;
+}
+

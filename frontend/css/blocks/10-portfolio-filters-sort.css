@@ -1,0 +1,645 @@
+/* ==================================================
+   BLOCK 10 — PORTFOLIO FILTERS / SEARCH / SORT / ПОИСК И СОРТИРОВКА
+   Что здесь: Search input, Sort by dropdown, options menu,
+   одинаковый размер search/sort, scrollbar sort menu.
+   Используется: dashboard.html → .portfolio-controls
+================================================== */
+
+/* ==================================================
+   FINAL OVERRIDE — CUSTOM SORT DROPDOWN
+   Красивый dropdown сортировки портфеля
+================================================== */
+
+.native-sort-select {
+    display: none !important;
+}
+
+.sort-dropdown {
+    position: relative !important;
+    width: 330px !important;
+    max-width: 100% !important;
+    z-index: 30 !important;
+}
+
+.sort-dropdown-toggle {
+    width: 100% !important;
+    min-height: 58px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+
+    padding: 10px 16px !important;
+
+    border-radius: 18px !important;
+    border: 1px solid rgba(96, 165, 250, 0.28) !important;
+
+    background:
+        linear-gradient(135deg, rgba(51, 65, 85, 0.98), rgba(35, 48, 68, 0.98)) !important;
+
+    color: #f8fafc !important;
+    cursor: pointer !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 14px 30px rgba(2, 6, 23, 0.26) !important;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease !important;
+}
+
+.sort-dropdown-toggle:hover {
+    transform: translateY(-1px) !important;
+    border-color: rgba(96, 165, 250, 0.55) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.10),
+        0 18px 38px rgba(37, 99, 235, 0.16) !important;
+}
+
+.sort-dropdown.open .sort-dropdown-toggle {
+    border-color: rgba(96, 165, 250, 0.85) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.16),
+        0 22px 46px rgba(37, 99, 235, 0.18) !important;
+}
+
+.sort-dropdown-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-width: 0 !important;
+}
+
+.sort-dropdown-left div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    min-width: 0 !important;
+}
+
+.sort-dropdown-left strong {
+    max-width: 220px !important;
+
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 950 !important;
+    line-height: 1.15 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.sort-dropdown-left small {
+    margin-top: 3px !important;
+
+    color: #9fb3cf !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.sort-dropdown-icon {
+    width: 42px !important;
+    height: 42px !important;
+    flex: 0 0 42px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 14px !important;
+
+    background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(124, 58, 237, 0.95)) !important;
+
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 950 !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        0 10px 20px rgba(59, 130, 246, 0.22) !important;
+}
+
+.sort-dropdown-arrow {
+    color: #bfdbfe !important;
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+
+    transition: transform 0.18s ease !important;
+}
+
+.sort-dropdown.open .sort-dropdown-arrow {
+    transform: rotate(180deg) !important;
+}
+
+.sort-dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 10px) !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    display: none !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+
+    padding: 8px !important;
+
+    border-radius: 18px !important;
+    border: 1px solid rgba(148, 163, 184, 0.20) !important;
+
+    background:
+        linear-gradient(180deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98)) !important;
+
+    box-shadow:
+        0 24px 60px rgba(2, 6, 23, 0.52),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+
+    backdrop-filter: blur(14px) !important;
+    z-index: 999 !important;
+}
+
+.sort-dropdown.open .sort-dropdown-menu {
+    display: flex !important;
+}
+
+.sort-dropdown-option {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+
+    padding: 12px !important;
+
+    border: 0 !important;
+    border-radius: 14px !important;
+
+    background: transparent !important;
+    color: #f8fafc !important;
+
+    cursor: pointer !important;
+    text-align: left !important;
+
+    transition:
+        background 0.16s ease,
+        transform 0.16s ease,
+        box-shadow 0.16s ease !important;
+}
+
+.sort-dropdown-option:hover {
+    transform: translateX(2px) !important;
+
+    background:
+        linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(124, 58, 237, 0.12)) !important;
+}
+
+.sort-dropdown-option.active {
+    background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.34), rgba(124, 58, 237, 0.24)) !important;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(96, 165, 250, 0.20) !important;
+}
+
+.sort-option-icon {
+    width: 38px !important;
+    height: 38px !important;
+    flex: 0 0 38px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 13px !important;
+
+    background: rgba(59, 130, 246, 0.18) !important;
+    color: #93c5fd !important;
+
+    font-size: 14px !important;
+    font-weight: 950 !important;
+}
+
+.sort-dropdown-option.active .sort-option-icon {
+    background:
+        linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(124, 58, 237, 0.95)) !important;
+
+    color: #ffffff !important;
+}
+
+.sort-dropdown-option span:last-child {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+}
+
+.sort-dropdown-option strong {
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    line-height: 1.15 !important;
+}
+
+.sort-dropdown-option small {
+    color: #9fb3cf !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+}
+
+
+/* Mobile */
+@media (max-width: 900px) {
+    .sort-dropdown {
+        width: 100% !important;
+    }
+}
+/* ==================================================
+   FINAL FIX — SORT DROPDOWN CLICK + NO ARROW
+================================================== */
+
+.sort-dropdown-toggle {
+    pointer-events: auto !important;
+}
+
+.sort-dropdown-toggle * {
+    pointer-events: none !important;
+}
+
+.sort-dropdown-menu {
+    pointer-events: auto !important;
+}
+
+.sort-dropdown-option,
+.sort-dropdown-option * {
+    pointer-events: auto !important;
+}
+
+/* Если где-то стрелка ещё осталась — скрываем */
+.sort-dropdown-arrow {
+    display: none !important;
+}
+
+/* Убираем белую системную рамку при клике */
+.sort-dropdown-toggle:focus {
+    outline: none !important;
+}
+
+.sort-dropdown-toggle:focus-visible {
+    outline: none !important;
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.18),
+        0 18px 38px rgba(37, 99, 235, 0.16) !important;
+}
+/* ==================================================
+   FINAL FIX — PORTFOLIO FILTERS SAME SIZE + SORT MENU SCROLL
+   Search и Sort by одинаковые + dropdown не выходит за экран
+================================================== */
+
+/* Контейнер Search + Sort */
+.portfolio-controls {
+    display: grid !important;
+    grid-template-columns: 440px 440px !important;
+    align-items: end !important;
+    gap: 18px !important;
+
+    width: fit-content !important;
+    max-width: 100% !important;
+
+    position: relative !important;
+    z-index: 5000 !important;
+}
+
+/* Обёртки Search и Sort */
+.portfolio-search,
+.portfolio-sort {
+    width: 440px !important;
+    max-width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    position: relative !important;
+}
+
+/* Labels одинаковые */
+.portfolio-search label,
+.portfolio-sort label {
+    margin: 0 !important;
+
+    color: #a9bdd8 !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+}
+
+/* Search input — тот же размер, что Sort */
+#searchPortfolio {
+    width: 100% !important;
+    height: 64px !important;
+    min-height: 64px !important;
+
+    padding: 0 18px !important;
+
+    border-radius: 18px !important;
+    border: 1px solid rgba(148, 163, 184, 0.22) !important;
+
+    background:
+        linear-gradient(135deg, rgba(51, 65, 85, 0.96), rgba(42, 55, 74, 0.92)) !important;
+
+    color: #f8fafc !important;
+
+    font-size: 18px !important;
+    font-weight: 700 !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 12px 26px rgba(0, 0, 0, 0.18) !important;
+
+    outline: none !important;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease,
+        transform 0.18s ease !important;
+}
+
+#searchPortfolio::placeholder {
+    color: #a9b8cc !important;
+    font-weight: 600 !important;
+}
+
+#searchPortfolio:focus {
+    border-color: rgba(96, 165, 250, 0.68) !important;
+
+    background:
+        linear-gradient(135deg, rgba(51, 65, 85, 1), rgba(29, 65, 143, 0.34)) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.14),
+        0 18px 36px rgba(37, 99, 235, 0.14) !important;
+}
+
+/* Sort dropdown — такой же размер, как Search */
+.sort-dropdown {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    position: relative !important;
+    z-index: 9999 !important;
+}
+
+/* Кнопка Sort by */
+.sort-dropdown-toggle {
+    width: 100% !important;
+    height: 64px !important;
+    min-height: 64px !important;
+
+    padding: 10px 18px !important;
+
+    border-radius: 18px !important;
+    border: 1px solid rgba(96, 165, 250, 0.30) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.88), rgba(26, 103, 139, 0.72)) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 14px 28px rgba(0, 0, 0, 0.24) !important;
+
+    cursor: pointer !important;
+}
+
+/* Текст внутри Sort */
+.sort-dropdown-left strong {
+    max-width: 310px !important;
+
+    font-size: 18px !important;
+    font-weight: 950 !important;
+    line-height: 1.1 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.sort-dropdown-left small {
+    max-width: 310px !important;
+
+    margin-top: 4px !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #b7c9e6 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Иконка Sort */
+.sort-dropdown-icon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+
+    border-radius: 15px !important;
+
+    background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(14, 116, 144, 0.88)) !important;
+
+    color: #ffffff !important;
+
+    font-size: 17px !important;
+    font-weight: 950 !important;
+}
+/* ==================================================
+   SORT MENU — НЕ ВЫХОДИТ ЗА ВЫСОТУ ЭКРАНА
+================================================== */
+
+.sort-dropdown-menu {
+    position: absolute !important;
+
+    top: calc(100% + 12px) !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+
+    display: none !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    /* Главное: ограничиваем высоту */
+    max-height: 380px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    padding: 10px !important;
+
+    border-radius: 20px !important;
+    border: 1px solid rgba(96, 165, 250, 0.24) !important;
+
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.99), rgba(20, 31, 50, 0.99)) !important;
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.58),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+
+    -webkit-backdrop-filter: blur(16px) !important;
+    backdrop-filter: blur(16px) !important;
+
+    z-index: 99999 !important;
+
+    overscroll-behavior: contain !important;
+}
+
+/* Когда открыто */
+.sort-dropdown.open .sort-dropdown-menu {
+    display: flex !important;
+}
+
+/* Варианты сортировки */
+.sort-dropdown-option {
+    width: 100% !important;
+    min-height: 72px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+
+    padding: 12px 14px !important;
+
+    border-radius: 16px !important;
+    border: 1px solid rgba(148, 163, 184, 0.10) !important;
+
+    background:
+        linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.92)) !important;
+
+    color: #f8fafc !important;
+    cursor: pointer !important;
+
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease,
+        transform 0.16s ease,
+        box-shadow 0.16s ease !important;
+}
+
+.sort-dropdown-option:hover {
+    transform: translateX(3px) !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.58), rgba(26, 103, 139, 0.42)) !important;
+
+    border-color: rgba(96, 165, 250, 0.30) !important;
+    box-shadow:
+        0 5px 12px rgba(29, 79, 187, 0.22) !important;
+}
+
+.sort-dropdown-option.active {
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.88), rgba(26, 103, 139, 0.62)) !important;
+
+    border-color: rgba(96, 165, 250, 0.40) !important;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(96, 165, 250, 0.12),
+        0 10px 24px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* Иконки внутри меню */
+.sort-option-icon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+
+    border-radius: 15px !important;
+
+    background:
+        linear-gradient(135deg, rgba(29, 65, 143, 0.70), rgba(26, 103, 139, 0.44)) !important;
+
+    color: #bfdbfe !important;
+
+    font-size: 15px !important;
+    font-weight: 950 !important;
+}
+
+.sort-dropdown-option.active .sort-option-icon {
+    background:
+        linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(37, 99, 235, 0.92)) !important;
+
+    color: #ffffff !important;
+}
+
+/* Текст option */
+.sort-dropdown-option strong {
+    font-size: 17px !important;
+    font-weight: 950 !important;
+    line-height: 1.12 !important;
+}
+
+.sort-dropdown-option small {
+    margin-top: 4px !important;
+
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #a9bdd8 !important;
+}
+
+/* Красивый scrollbar внутри Sort menu */
+.sort-dropdown-menu::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+.sort-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.75) !important;
+    border-radius: 999px !important;
+}
+
+.sort-dropdown-menu::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(180deg, rgba(59, 130, 246, 0.75), rgba(14, 165, 233, 0.55)) !important;
+
+    border-radius: 999px !important;
+}
+
+.sort-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background:
+        linear-gradient(180deg, rgba(96, 165, 250, 0.95), rgba(56, 189, 248, 0.75)) !important;
+}
+
+/* Firefox scrollbar */
+.sort-dropdown-menu {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(59, 130, 246, 0.75) rgba(15, 23, 42, 0.75) !important;
+}
+
+
+/* ==================================================
+   BLOCK 10.9 — STRAIGHT RIGHT BORDER
+   Правый край sort select делаем прямым
+================================================== */
+
+.sort-dropdown-trigger,
+.sort-dropdown-menu,
+.sort-dropdown-list {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}

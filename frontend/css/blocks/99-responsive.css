@@ -1,0 +1,111 @@
+/* ==================================================
+   BLOCK 99 — RESPONSIVE / ADAPTIVE FIXES / АДАПТАЦИЯ ПОД ЭКРАНЫ
+   Что здесь: общие адаптации под laptop/tablet/mobile.
+   Важно: маленькие media-запросы, которые относятся только к одному блоку,
+   могут оставаться внутри файла этого блока.
+================================================== */
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 1100px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .portfolio-controls {
+        grid-template-columns: 1fr;
+        max-width: none;
+    }
+}
+
+@media (max-width: 760px) {
+    .dashboard-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 30px;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-container {
+        padding: 0 14px 28px;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .transactions-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .transaction-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .transaction-right {
+        width: 100%;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        text-align: left;
+    }
+
+    .allocation-info {
+        flex-wrap: wrap;
+    }
+
+    .allocation-percent {
+        margin-left: 0;
+    }
+
+    .auth-container {
+        width: calc(100% - 28px);
+        margin: 70px auto;
+    }
+}
+
+/* ==================================================
+   LAPTOP / SMALL SCREEN FIX
+================================================== */
+
+@media (max-width: 1100px) {
+    .portfolio-controls {
+        grid-template-columns: 1fr 1fr !important;
+        width: 100% !important;
+    }
+
+    .portfolio-search,
+    .portfolio-sort {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 760px) {
+    .portfolio-controls {
+        grid-template-columns: 1fr !important;
+    }
+
+    #searchPortfolio,
+    .sort-dropdown-toggle {
+        height: 58px !important;
+        min-height: 58px !important;
+    }
+
+    .sort-dropdown-menu {
+        max-height: 320px !important;
+    }
+}

@@ -1,0 +1,205 @@
+/* ==================================================
+   CORE 00 — BASE / VARIABLES / RESET / ОСНОВА, ПЕРЕМЕННЫЕ, СБРОС
+   Что здесь: глобальные CSS-переменные, body, общие цвета,
+   базовые состояния profit/loss и пустые состояния.
+   Используется: все страницы, которые подключают css/style.css
+================================================== */
+
+/* ==================================================
+   BASE / VARIABLES / RESET
+================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #0f172a;
+    --card: rgba(31, 41, 55, 0.92);
+    --card-2: rgba(55, 65, 81, 0.92);
+
+    --surface: rgba(31, 41, 55, 0.92);
+    --surface-soft: rgba(55, 65, 81, 0.72);
+
+    --text: #f9fafb;
+    --muted: #94a3b8;
+    --muted-dark: #cbd5e1;
+
+    --border: rgba(148, 163, 184, 0.12);
+    --line: rgba(148, 163, 184, 0.24);
+    --line-soft: rgba(148, 163, 184, 0.10);
+
+    --green: #22c55e;
+    --green-dark: #16a34a;
+    --green-soft: rgba(34, 197, 94, 0.14);
+
+    --red: #ef4444;
+    --red-dark: #dc2626;
+    --red-soft: rgba(239, 68, 68, 0.14);
+
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+
+    --radius-lg: 22px;
+    --radius-md: 16px;
+
+    --shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 35%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.10), transparent 35%),
+        var(--bg);
+}
+
+a {
+    color: #38bdf8;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+.profit,
+.message-success {
+    color: var(--green);
+    font-weight: 800;
+}
+
+.loss,
+.message-error {
+    color: var(--red);
+    font-weight: 800;
+}
+
+.empty-portfolio {
+    margin: 10px 14px 0;
+    color: var(--text);
+}
+
+/* ==================================================
+   FINAL FIX — REMOVE NUMBER INPUT SPINNERS + CLEAN INPUT UX
+   Убирает стрелки у number input и делает поля аккуратнее
+================================================== */
+
+/* Chrome, Edge, Safari — убираем стрелки справа у number input */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+/* Firefox — убираем стрелки у number input */
+input[type="number"] {
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+}
+
+/* Чтобы текст в input не выглядел как системно выделенный/кривой */
+#addCryptoForm input,
+.edit-field input {
+    caret-color: #ffffff !important;
+    user-select: text !important;
+}
+
+/* Placeholder — обычный спокойный текст, не как выбранное значение */
+#addCryptoForm input::placeholder,
+.edit-field input::placeholder {
+    color: #9fb3cf !important;
+    opacity: 0.85 !important;
+    font-weight: 600 !important;
+}
+
+/* Когда поле НЕ выбрано — без сильной подсветки */
+#addCryptoForm input:not(:focus),
+.edit-field input:not(:focus) {
+    outline: none !important;
+}
+
+/* Когда поле выбрано — подсветка только рамкой, без ощущения "выделенного текста" */
+#addCryptoForm input:focus,
+.edit-field input:focus {
+    outline: none !important;
+}
+
+/* Убираем случайное выделение текста на кастомных dropdown-кнопках */
+.crypto-dropdown-toggle,
+.crypto-dropdown-toggle *,
+.crypto-dropdown-option,
+.crypto-dropdown-option *,
+.sort-dropdown-toggle,
+.sort-dropdown-toggle *,
+.sort-dropdown-option,
+.sort-dropdown-option *,
+.transaction-switch-btn,
+.transaction-switch-btn * {
+    user-select: none !important;
+}
+
+/* Чтобы кнопки не показывали текстовый курсор */
+.crypto-dropdown-toggle,
+.crypto-dropdown-option,
+.sort-dropdown-toggle,
+.sort-dropdown-option,
+.transaction-switch-btn {
+    cursor: pointer !important;
+}
+/* ==================================================
+   FINAL FIX — NORMAL CURSOR ON TEXT
+   Стрелка на обычном тексте, текстовый курсор только в полях ввода
+================================================== */
+
+/* На всём сайте обычная стрелка */
+body,
+body * {
+    cursor: default !important;
+}
+
+/* На кнопках, ссылках и dropdown — рука */
+button,
+a,
+.crypto-dropdown-toggle,
+.crypto-dropdown-option,
+.sort-dropdown-toggle,
+.sort-dropdown-option,
+.transaction-switch-btn,
+.edit-btn,
+.delete-btn,
+.edit-save-btn,
+.edit-cancel-btn,
+.edit-close-btn,
+.transactions-view-btn,
+.dashboard-nav-link {
+    cursor: pointer !important;
+}
+
+/* Текстовый курсор только там, где реально можно писать */
+input,
+textarea,
+input *,
+textarea * {
+    cursor: text !important;
+}
+
+/* Select скрытые/настоящие — обычная стрелка или pointer */
+select {
+    cursor: pointer !important;
+}
+
+/* Чтобы обычные тексты не вели себя как редактируемые */
+h1, h2, h3, h4, h5, h6,
+p, span, strong, small, label,
+div {
+    cursor: default !important;
+}
+
+/* Но label, который связан с input/select, пусть выглядит кликабельнее */
+label {
+    cursor: default !important;
+}

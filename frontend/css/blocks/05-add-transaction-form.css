@@ -1,0 +1,485 @@
+/* ==================================================
+   BLOCK 05 — ADD TRANSACTION / BUY-SELL FORM
+   БЛОК 05 — ФОРМА ПОКУПКИ / ПРОДАЖИ КРИПТЫ
+
+   Что здесь:
+   - карточка Add Transaction
+   - переключатель BUY / SELL
+   - поля Quantity / Price
+   - Live market price
+   - Total transaction value
+   - кнопка submit
+
+   Используется:
+   dashboard.html → .add-crypto-card / #addCryptoForm
+================================================== */
+
+
+/* ==================================================
+   05.1 — ADD TRANSACTION CARD
+   Карточка Add Transaction
+================================================== */
+
+.add-crypto-card {
+    position: relative !important;
+    overflow: hidden !important;
+
+    margin-top: 70px !important;
+    margin-bottom: 40px !important;
+    padding: 20px 24px 0 !important;
+
+    /* Только цвет: отделяем блок от остальных карточек */
+    background:
+        linear-gradient(135deg,
+            rgba(8, 47, 73, 0.92),
+            rgba(15, 23, 42, 0.95) 48%,
+            rgba(20, 83, 45, 0.30)
+        ) !important;
+
+    border: 1px solid rgba(2, 172, 245, 0.38) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 0 0 1px rgba(34, 211, 238, 0.06),
+        0 22px 45px rgba(0, 0, 0, 0.24),
+        0 0 34px rgba(34, 211, 238, 0.10) !important;
+}
+
+.add-crypto-card::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -150px !important;
+    right: -150px !important;
+
+    width: 240px !important;
+    height: 240px !important;
+
+    background:
+        radial-gradient(circle, rgba(34, 197, 94, 0.22), transparent 68%) !important;
+
+    pointer-events: none !important;
+}
+
+.add-crypto-card:has(#addCryptoForm.buy-mode)::before {
+    background:
+        radial-gradient(circle, rgba(16, 172, 73, 0.24), transparent 68%) !important;
+}
+
+.add-crypto-card:has(#addCryptoForm.sell-mode)::before {
+    background:
+        radial-gradient(circle, rgba(239, 68, 68, 0.26), transparent 68%) !important;
+}
+
+.add-crypto-card h2 {
+    position: relative !important;
+    margin: 0 0 12px !important;
+    font-size: 22px !important;
+}
+
+
+/* ==================================================
+   05.2 — FORM BASE
+   Основные настройки формы
+================================================== */
+
+#addCryptoForm {
+    position: relative !important;
+}
+
+#addCryptoForm > .form-label:first-child {
+    margin-bottom: 6px !important;
+}
+
+#addCryptoForm .form-label {
+    margin: 0 !important;
+
+    color: #4d83c1 !important;
+
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    font-weight: 900 !important;
+}
+
+#addCryptoForm.sell-mode .form-label {
+    color: #fca5a5 !important;
+}
+
+#addCryptoForm select,
+#addCryptoForm input {
+    height: 44px !important;
+    min-height: 44px !important;
+
+    padding: 0 14px !important;
+
+    border-radius: 13px !important;
+    border: 1px solid rgba(34, 197, 94, 0.45) !important;
+
+    background: rgba(51, 65, 85, 0.92) !important;
+    color: #e2e8f0 !important;
+
+    font-size: 14px !important;
+    font-weight: 600 !important;
+
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.10) !important;
+}
+
+#addCryptoForm input {
+    height: 46px !important;
+    min-height: 46px !important;
+}
+
+#addCryptoForm select:focus,
+#addCryptoForm input:focus {
+    border-color: rgba(34, 197, 94, 0.90) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.16) !important;
+}
+
+#addCryptoForm.sell-mode select,
+#addCryptoForm.sell-mode input {
+    border-color: rgba(248, 113, 113, 0.45) !important;
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.10) !important;
+}
+
+#addCryptoForm.sell-mode select:focus,
+#addCryptoForm.sell-mode input:focus {
+    border-color: rgba(248, 113, 113, 0.95) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.18) !important;
+}
+
+
+/* ==================================================
+   05.3 — BUY / SELL SWITCH
+   Переключатель BUY / SELL
+================================================== */
+
+.transaction-type-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px !important;
+    margin-bottom: 21px !important;
+}
+
+.transaction-switch-btn {
+    min-height: 58px !important;
+    padding: 10px 16px !important;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+
+    border-radius: 16px !important;
+    border: 1px solid rgba(148, 163, 184, 0.22) !important;
+
+    background: rgba(51, 65, 85, 0.90) !important;
+    color: #cbd5e1 !important;
+
+    cursor: pointer;
+
+    font-size: 17px !important;
+    line-height: 1 !important;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease,
+        color 0.18s ease;
+}
+
+.transaction-switch-btn span {
+    margin-top: 2px !important;
+
+    color: #94a3b8 !important;
+
+    font-size: 12px !important;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.transaction-switch-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* BUY active / hover */
+#addCryptoForm .transaction-switch-btn[data-type="BUY"]:hover,
+#addCryptoForm .transaction-switch-btn.active[data-type="BUY"] {
+    background:
+        linear-gradient(135deg, rgba(34, 197, 94, 0.28), rgba(21, 128, 61, 0.22)) !important;
+
+    border-color: rgba(34, 197, 94, 0.85) !important;
+    color: #86efac !important;
+
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12) !important;
+}
+
+#addCryptoForm .transaction-switch-btn[data-type="BUY"]:hover span,
+#addCryptoForm .transaction-switch-btn.active[data-type="BUY"] span {
+    color: #bbf7d0 !important;
+}
+
+/* SELL active / hover */
+#addCryptoForm .transaction-switch-btn[data-type="SELL"]:hover,
+#addCryptoForm .transaction-switch-btn.active[data-type="SELL"] {
+    background:
+        linear-gradient(135deg, rgba(239, 68, 68, 0.30), rgba(127, 29, 29, 0.24)) !important;
+
+    border-color: rgba(248, 113, 113, 0.90) !important;
+    color: #fca5a5 !important;
+
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.14) !important;
+}
+
+#addCryptoForm .transaction-switch-btn[data-type="SELL"]:hover span,
+#addCryptoForm .transaction-switch-btn.active[data-type="SELL"] span {
+    color: #fecaca !important;
+}
+
+
+/* ==================================================
+   05.4 — FORM GRID / FIELDS
+   Сетка полей формы
+================================================== */
+
+.transaction-form-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+
+    gap: 10px 16px !important;
+    margin-top: 10px !important;
+}
+
+.transaction-field {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.transaction-field-full {
+    grid-column: 1 / -1 !important;
+}
+
+#addCryptoForm .transaction-field .form-label {
+    margin-bottom: 2px !important;
+
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+}
+
+#addCryptoForm .field-help {
+    display: none !important;
+}
+
+
+/* ==================================================
+   05.5 — LIVE PRICE / TOTAL PREVIEW
+   Карточки Live market price и Total value
+================================================== */
+
+.crypto-price-info,
+.transaction-preview {
+    min-height: 58px !important;
+    padding: 10px 16px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+
+    margin: 0 !important;
+
+    border-radius: 16px !important;
+    border: 1px solid rgba(56, 189, 248, 0.18) !important;
+
+    background:
+        linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.72)) !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 14px 30px rgba(0, 0, 0, 0.18) !important;
+}
+
+.crypto-price-info {
+    margin-bottom: 10px !important;
+}
+
+.transaction-preview {
+    margin-top: 19px !important;
+}
+
+.crypto-price-info span,
+.transaction-preview span {
+    display: block !important;
+
+    color: #e2e8f0 !important;
+
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+}
+
+.crypto-price-info small,
+.transaction-preview small {
+    display: block !important;
+
+    margin-top: 2px !important;
+
+    color: #94a3b8 !important;
+
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    font-weight: 500 !important;
+}
+
+.crypto-price-info strong,
+.transaction-preview strong {
+    color: #ffffff !important;
+
+    font-size: 17px !important;
+    font-weight: 900 !important;
+
+    white-space: nowrap !important;
+}
+
+#addCryptoForm.buy-mode .transaction-preview {
+    border-color: rgba(34, 197, 94, 0.28) !important;
+    background:
+        linear-gradient(135deg, rgba(20, 83, 45, 0.34), rgba(15, 23, 42, 0.92)) !important;
+}
+
+#addCryptoForm.sell-mode .transaction-preview {
+    border-color: rgba(239, 68, 68, 0.32) !important;
+    background:
+        linear-gradient(135deg, rgba(127, 29, 29, 0.38), rgba(15, 23, 42, 0.92)) !important;
+}
+
+
+/* ==================================================
+   05.6 — SUBMIT BUTTON
+   Кнопка Add Buy / Sell Transaction
+================================================== */
+
+#addTransactionBtn {
+    min-height: 48px !important;
+    margin-top: 15px !important;
+
+    border-radius: 14px !important;
+
+    font-size: 15px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+}
+
+#addCryptoForm.buy-mode #addTransactionBtn {
+    background:
+        linear-gradient(135deg, #22c55e, #16a34a) !important;
+
+    color: #ffffff !important;
+
+    box-shadow: 0 14px 28px rgba(34, 197, 94, 0.22) !important;
+}
+
+#addCryptoForm.buy-mode #addTransactionBtn:hover {
+    background:
+        linear-gradient(135deg, #16a34a, #15803d) !important;
+}
+
+#addCryptoForm.sell-mode #addTransactionBtn {
+    background:
+        linear-gradient(135deg, #ef4444, #b91c1c) !important;
+
+    color: #ffffff !important;
+
+    box-shadow: 0 14px 28px rgba(239, 68, 68, 0.24) !important;
+}
+
+#addCryptoForm.sell-mode #addTransactionBtn:hover {
+    background:
+        linear-gradient(135deg, #dc2626, #b91c1c) !important;
+}
+
+
+/* ==================================================
+   05.7 — PAGE COMPACT MODE
+   Компактная верхняя часть страницы
+================================================== */
+
+body {
+    padding-top: 86px !important;
+}
+
+.dashboard-header {
+    min-height: 76px !important;
+    padding: 12px 32px !important;
+}
+
+.dashboard-logo h1 {
+    font-size: 30px !important;
+    line-height: 1 !important;
+}
+
+.dashboard-logo p {
+    margin-top: 2px !important;
+
+    font-size: 13px !important;
+}
+
+.dashboard-nav {
+    gap: 4px !important;
+    padding: 4px !important;
+}
+
+.dashboard-nav-link {
+    min-height: 32px !important;
+    padding: 0 16px !important;
+
+    font-size: 13px !important;
+}
+
+.header-actions button {
+    min-height: 38px !important;
+    padding: 0 16px !important;
+
+    border-radius: 13px !important;
+
+    font-size: 13px !important;
+}
+
+.dashboard-container {
+    padding: 8px 36px 40px !important;
+}
+
+
+/* ==================================================
+   05.8 — RESPONSIVE
+   Адаптация под маленькие экраны
+================================================== */
+
+@media (max-width: 760px) {
+    .transaction-type-switch,
+    .transaction-form-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .crypto-price-info,
+    .transaction-preview {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+    }
+
+    .crypto-price-info strong,
+    .transaction-preview strong {
+        font-size: 20px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .transaction-switch-btn {
+        padding: 16px !important;
+        font-size: 18px !important;
+    }
+}
