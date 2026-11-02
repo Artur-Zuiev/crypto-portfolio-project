@@ -1,39 +1,13 @@
-/* ==================================================
-   BLOCK 04 — SUMMARY CARDS / КАРТОЧКИ СТАТИСТИКИ
-   Что здесь: карточки Total Value, Total Invested, Profit/Loss,
-   Assets, Best Coin, Worst Coin.
-   Используется: dashboard.html → .summary-grid
-================================================== */
-
-/* ==================================================
-   SUMMARY
-================================================== */
-
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    margin: 0 0 24px;
-}
-
+/* Portfolio KPIs — values are populated by existing dashboard.js. */
+.summary-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin: 0 0 22px; }
 .summary-card {
-    padding: 22px;
-    background: linear-gradient(145deg, #1f2937, #172033);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.20);
+ position: relative; overflow: hidden; min-width: 0; min-height: 124px; padding: 22px;
+ border: 1px solid var(--border); border-radius: 14px;
+ background: linear-gradient(145deg,#18243b,#101a2e); box-shadow: 0 12px 26px rgba(0,0,0,.13);
 }
-
-.summary-card h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    color: #9ca3af;
-    font-size: 15px;
-}
-
-.summary-card p {
-    margin-bottom: 0;
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
-}
+.summary-card:first-child { border-color: #7869fb; background: linear-gradient(145deg,#27254c,#141b33); }
+.summary-card:first-child::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 30px; opacity: .38; background: linear-gradient(0deg,rgba(126,97,255,.45),transparent); pointer-events: none; }
+.summary-card h3 { margin: 0 0 14px; color: #aab7d1; font-size: 13px; font-weight: 650; }
+.summary-card p { margin: 0; overflow-wrap: anywhere; color: #f3f6ff; font-size: clamp(22px,2.1vw,30px); font-weight: 800; letter-spacing: -.6px; }
+@media (max-width: 1200px) { .summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 640px) { .summary-grid { grid-template-columns: 1fr; } .summary-card { min-height: 105px; } }
