@@ -12,7 +12,7 @@ public class UpdatePortfolioItemRequest {
     private BigDecimal quantity;
 
     @NotNull(message = "Average buy price is required")
-    @DecimalMin(value = "0.01", message = "Average buy price must be greater than 0")
+    @DecimalMin(value = "0.000000000000000001", message = "Average buy price must be greater than 0")
     private BigDecimal averageBuyPrice;
 
     public BigDecimal getQuantity() {
