@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,22 +68,22 @@ public class PortfolioService {
 
         if (existingItem != null) {
 
-            Double oldQuantity = existingItem.getQuantity();
-            Double oldAverageBuyPrice = existingItem.getAverageBuyPrice();
+            BigDecimal oldQuantity = existingItem.getQuantity();
+            BigDecimal oldAverageBuyPrice = existingItem.getAverageBuyPrice();
 
-            Double newQuantity = request.getQuantity();
-            Double newBuyPrice = request.getAverageBuyPrice();
+            BigDecimal newQuantity = request.getQuantity();
+            BigDecimal newBuyPrice = request.getAverageBuyPrice();
 
-            Double totalQuantity = oldQuantity + newQuantity;
-            Double totalInvested = (oldQuantity * oldAverageBuyPrice) + (newQuantity * newBuyPrice);
-            Double newAverageBuyPrice = totalInvested / totalQuantity;
+            BigDecimal totalQuantity = oldQuantity.add(newQuantity);
+            BigDecimal totalInvested = oldQuantity.multiply(oldAverageBuyPrice).add(newQuantity.multiply(newBuyPrice));
+            BigDecimal newAverageBuyPrice = totalInvested.divide(totalQuantity, 18, RoundingMode.HALF_UP);
 
             existingItem.setQuantity(totalQuantity);
             existingItem.setAverageBuyPrice(newAverageBuyPrice);
 
             PortfolioItem savedItem = portfolioItemRepository.save(existingItem);
 
-            return ResponseEntity.ok(convertToResponse(savedItem, 0.0));
+            return ResponseEntity.ok(convertToResponse(savedItem, BigDecimal.ZERO));
         }
 
         PortfolioItem item = new PortfolioItem();
@@ -94,7 +96,7 @@ public class PortfolioService {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(convertToResponse(savedItem, 0.0));
+                .body(convertToResponse(savedItem, BigDecimal.ZERO));
     }
 
     public ResponseEntity<?> getPortfolioByUserEmail(String email) {
@@ -110,7 +112,7 @@ public class PortfolioService {
 
         List<PortfolioItem> items = portfolioItemRepository.findByUserId(user.getId());
 
-        Double totalValue = calculateTotalValue(items);
+        BigDecimal totalValue = calculateTotalValue(items);
 
         List<PortfolioItemResponse> response = new ArrayList<>();
 
@@ -134,29 +136,29 @@ public class PortfolioService {
 
         List<PortfolioItem> items = portfolioItemRepository.findByUserId(user.getId());
 
-        Double totalValue = 0.0;
-        Double totalInvested = 0.0;
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal totalInvested = BigDecimal.ZERO;
 
         String bestAssetSymbol = "-";
-        Double bestAssetProfitLoss = 0.0;
+        BigDecimal bestAssetProfitLoss = BigDecimal.ZERO;
 
         String worstAssetSymbol = "-";
-        Double worstAssetProfitLoss = 0.0;
+        BigDecimal worstAssetProfitLoss = BigDecimal.ZERO;
 
         boolean firstItem = true;
 
         for (PortfolioItem item : items) {
 
-            Double quantity = item.getQuantity();
-            Double averageBuyPrice = item.getAverageBuyPrice();
-            Double currentPrice = item.getCryptoCurrency().getCurrentPrice();
+            BigDecimal quantity = item.getQuantity();
+            BigDecimal averageBuyPrice = item.getAverageBuyPrice();
+            BigDecimal currentPrice = item.getCryptoCurrency().getCurrentPrice();
 
-            Double currentValue = quantity * currentPrice;
-            Double investedValue = quantity * averageBuyPrice;
-            Double profitLoss = currentValue - investedValue;
+            BigDecimal currentValue = quantity.multiply(currentPrice);
+            BigDecimal investedValue = quantity.multiply(averageBuyPrice);
+            BigDecimal profitLoss = currentValue.subtract(investedValue);
 
-            totalValue += currentValue;
-            totalInvested += investedValue;
+            totalValue = totalValue.add(currentValue);
+            totalInvested = totalInvested.add(investedValue);
 
             if (firstItem) {
                 bestAssetSymbol = item.getCryptoCurrency().getSymbol();
@@ -167,19 +169,19 @@ public class PortfolioService {
 
                 firstItem = false;
             } else {
-                if (profitLoss > bestAssetProfitLoss) {
+                if (profitLoss.compareTo(bestAssetProfitLoss) > 0) {
                     bestAssetSymbol = item.getCryptoCurrency().getSymbol();
                     bestAssetProfitLoss = profitLoss;
                 }
 
-                if (profitLoss < worstAssetProfitLoss) {
+                if (profitLoss.compareTo(worstAssetProfitLoss) < 0) {
                     worstAssetSymbol = item.getCryptoCurrency().getSymbol();
                     worstAssetProfitLoss = profitLoss;
                 }
             }
         }
 
-        Double totalProfitLoss = totalValue - totalInvested;
+        BigDecimal totalProfitLoss = totalValue.subtract(totalInvested);
         Integer assetCount = items.size();
 
         PortfolioSummaryResponse response = new PortfolioSummaryResponse(
@@ -222,7 +224,7 @@ public class PortfolioService {
 
         PortfolioItem savedItem = portfolioItemRepository.save(item);
 
-        return ResponseEntity.ok(convertToResponse(savedItem, 0.0));
+        return ResponseEntity.ok(convertToResponse(savedItem, BigDecimal.ZERO));
     }
 
     public ResponseEntity<MessageResponse> deletePortfolioItem(String email, Long itemId) {
@@ -247,12 +249,12 @@ public class PortfolioService {
         return ResponseEntity.ok(new MessageResponse("Portfolio item deleted successfully"));
     }
 
-    private Double calculateTotalValue(List<PortfolioItem> items) {
-        Double totalValue = 0.0;
+    private BigDecimal calculateTotalValue(List<PortfolioItem> items) {
+        BigDecimal totalValue = BigDecimal.ZERO;
 
         for (PortfolioItem item : items) {
-            Double quantity = item.getQuantity();
-            Double currentPrice = item.getCryptoCurrency().getCurrentPrice();
+            BigDecimal quantity = item.getQuantity();
+            BigDecimal currentPrice = item.getCryptoCurrency().getCurrentPrice();
 
             totalValue += quantity * currentPrice;
         }
@@ -260,20 +262,20 @@ public class PortfolioService {
         return totalValue;
     }
 
-    private PortfolioItemResponse convertToResponse(PortfolioItem item, Double totalValue) {
+    private PortfolioItemResponse convertToResponse(PortfolioItem item, BigDecimal totalValue) {
 
-        Double quantity = item.getQuantity();
-        Double averageBuyPrice = item.getAverageBuyPrice();
-        Double currentPrice = item.getCryptoCurrency().getCurrentPrice();
+        BigDecimal quantity = item.getQuantity();
+        BigDecimal averageBuyPrice = item.getAverageBuyPrice();
+        BigDecimal currentPrice = item.getCryptoCurrency().getCurrentPrice();
 
-        Double currentValue = quantity * currentPrice;
-        Double investedValue = quantity * averageBuyPrice;
-        Double profitLoss = currentValue - investedValue;
+        BigDecimal currentValue = quantity * currentPrice;
+        BigDecimal investedValue = quantity * averageBuyPrice;
+        BigDecimal profitLoss = currentValue - investedValue;
 
-        Double allocationPercentage = 0.0;
+        BigDecimal allocationPercentage = BigDecimal.ZERO;
 
-        if (totalValue > 0) {
-            allocationPercentage = (currentValue / totalValue) * 100;
+        if (totalValue.signum() > 0) {
+            allocationPercentage = currentValue.multiply(BigDecimal.valueOf(100)).divide(totalValue, 8, RoundingMode.HALF_UP);
         }
 
         return new PortfolioItemResponse(
@@ -289,7 +291,7 @@ public class PortfolioService {
         );
     }
 
-    private Double round2(Double value) {
-        return Math.round(value * 100.0) / 100.0;
+    private BigDecimal round2(BigDecimal value) {
+        return Math.round(value * 10BigDecimal.ZERO) / 10BigDecimal.ZERO;
     }
 }
