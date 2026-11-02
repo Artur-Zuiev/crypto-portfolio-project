@@ -88,7 +88,9 @@ public class TransactionService {
     private static void validate(AddTransactionRequest request) {
         if (request == null || request.getCryptoCurrencyId() == null || request.getQuantity() == null
                 || request.getPrice() == null || request.getQuantity().signum() <= 0 || request.getPrice().signum() <= 0
-                || request.getQuantity().scale() > 18 || request.getPrice().scale() > 18) {
+                || request.getQuantity().scale() > 18 || request.getPrice().scale() > 18
+                || request.getQuantity().precision() - request.getQuantity().scale() > 20
+                || request.getPrice().precision() - request.getPrice().scale() > 20) {
             throw new IllegalArgumentException("Valid positive quantity and price with at most 18 decimal places required");
         }
     }
