@@ -1,5 +1,7 @@
 package com.artur.cryptoportfolio.dto;
 
+import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
 
 public class TransactionResponse {
@@ -8,9 +10,9 @@ public class TransactionResponse {
     private String cryptoSymbol;
     private String cryptoName;
     private String type;
-    private Double quantity;
-    private Double price;
-    private Double totalValue;
+    private BigDecimal quantity;
+    private BigDecimal price;
+    private BigDecimal totalValue;
     private LocalDateTime transactionDate;
 
     public TransactionResponse() {
@@ -21,9 +23,9 @@ public class TransactionResponse {
             String cryptoSymbol,
             String cryptoName,
             String type,
-            Double quantity,
-            Double price,
-            Double totalValue,
+            BigDecimal quantity,
+            BigDecimal price,
+            BigDecimal totalValue,
             LocalDateTime transactionDate
     ) {
         this.id = id;
@@ -52,15 +54,15 @@ public class TransactionResponse {
         return type;
     }
 
-    public Double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public Double getTotalValue() {
+    public BigDecimal getTotalValue() {
         return totalValue;
     }
     
