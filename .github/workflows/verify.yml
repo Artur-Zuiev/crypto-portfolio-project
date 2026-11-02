@@ -20,8 +20,8 @@ jobs:
           java-version: '21'
           cache: maven
           cache-dependency-path: backend/cryptoportfolio/pom.xml
-      - name: Compile backend and tests
-        run: mvn -B -DskipTests test-compile
+      - name: Run isolated transaction and precision tests
+        run: mvn -B '-Dtest=TransactionPrecisionTest,PortfolioQuantityPrecisionTest,JwtServiceTest' test
 
   frontend-syntax:
     runs-on: ubuntu-latest
