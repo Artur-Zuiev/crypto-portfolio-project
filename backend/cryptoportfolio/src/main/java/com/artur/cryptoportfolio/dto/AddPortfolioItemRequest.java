@@ -1,10 +1,11 @@
 package com.artur.cryptoportfolio.dto;
 
 import java.math.BigDecimal;
-
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.DecimalMin;
+
+import jakarta.validation.constraints.NotBlank;
 
 public class AddPortfolioItemRequest {
 
@@ -13,10 +14,12 @@ public class AddPortfolioItemRequest {
 
     @NotNull(message = "Quantity is required")
     @DecimalMin(value = "0.000000000000000001", message = "Quantity must be greater than 0")
+    @Digits(integer = 20, fraction = 18)
     private BigDecimal quantity;
 
     @NotNull(message = "Average buy price is required")
     @DecimalMin(value = "0.000000000000000001", message = "Average buy price must be greater than 0")
+    @Digits(integer = 20, fraction = 18)
     private BigDecimal averageBuyPrice;
 
     public String getSymbol() {
