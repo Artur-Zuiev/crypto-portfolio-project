@@ -175,7 +175,7 @@ function formatEuro(value) {
 
 function formatNumber(value) {
     return Number(value || 0).toLocaleString("de-DE", {
-        maximumFractionDigits: 8
+        maximumFractionDigits: 16
     });
 }
 
