@@ -151,7 +151,7 @@ public class PortfolioService {
 
             BigDecimal quantity = item.getQuantity();
             BigDecimal averageBuyPrice = item.getAverageBuyPrice();
-            BigDecimal currentPrice = item.getCryptoCurrency().getCurrentPrice();
+            BigDecimal currentPrice = BigDecimal.valueOf(item.getCryptoCurrency().getCurrentPrice());
 
             BigDecimal currentValue = quantity.multiply(currentPrice);
             BigDecimal investedValue = quantity.multiply(averageBuyPrice);
@@ -254,9 +254,9 @@ public class PortfolioService {
 
         for (PortfolioItem item : items) {
             BigDecimal quantity = item.getQuantity();
-            BigDecimal currentPrice = item.getCryptoCurrency().getCurrentPrice();
+            BigDecimal currentPrice = BigDecimal.valueOf(item.getCryptoCurrency().getCurrentPrice());
 
-            totalValue += quantity * currentPrice;
+            totalValue = totalValue.add(quantity.multiply(currentPrice));
         }
 
         return totalValue;
@@ -266,11 +266,11 @@ public class PortfolioService {
 
         BigDecimal quantity = item.getQuantity();
         BigDecimal averageBuyPrice = item.getAverageBuyPrice();
-        BigDecimal currentPrice = item.getCryptoCurrency().getCurrentPrice();
+        BigDecimal currentPrice = BigDecimal.valueOf(item.getCryptoCurrency().getCurrentPrice());
 
-        BigDecimal currentValue = quantity * currentPrice;
-        BigDecimal investedValue = quantity * averageBuyPrice;
-        BigDecimal profitLoss = currentValue - investedValue;
+        BigDecimal currentValue = quantity.multiply(currentPrice);
+        BigDecimal investedValue = quantity.multiply(averageBuyPrice);
+        BigDecimal profitLoss = currentValue.subtract(investedValue);
 
         BigDecimal allocationPercentage = BigDecimal.ZERO;
 
@@ -292,6 +292,6 @@ public class PortfolioService {
     }
 
     private BigDecimal round2(BigDecimal value) {
-        return Math.round(value * 10BigDecimal.ZERO) / 10BigDecimal.ZERO;
+        return value.setScale(2, RoundingMode.HALF_UP);
     }
 }
