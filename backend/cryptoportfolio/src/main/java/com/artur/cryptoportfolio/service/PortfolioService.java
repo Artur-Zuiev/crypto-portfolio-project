@@ -280,7 +280,7 @@ public class PortfolioService {
                 item.getId(),
                 item.getCryptoCurrency().getSymbol(),
                 item.getCryptoCurrency().getName(),
-                round2(quantity),
+                quantity,
                 round2(averageBuyPrice),
                 round2(currentPrice),
                 round2(currentValue),
