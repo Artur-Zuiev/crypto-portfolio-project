@@ -1,286 +1,43 @@
-/* ==================================================
-   BLOCK 01 — DASHBOARD LAYOUT / ОБЩАЯ СТРУКТУРА СТРАНИЦЫ
-   Что здесь: общая сетка Dashboard/Transactions, header position,
-   dashboard-container, основные отступы карточек.
-   Используется: dashboard.html, transactions.html
-================================================== */
-
-/* ==================================================
-   HEADER
-================================================== */
-
+/* Desktop dashboard shell: real portfolio data and existing JS hooks stay unchanged. */
+body { min-height: 100vh; padding: 0 0 0 248px; }
 .dashboard-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-
-    width: 100%;
-    min-height: 96px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-
-    padding: 24px 36px;
-    margin: 0 0 28px;
-
-    background: rgba(15, 23, 42, 0.92);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-
-    border-bottom: 1px solid var(--border);
+  position: fixed; inset: 0 auto 0 0; z-index: 100;
+  width: 248px; height: 100vh; padding: 30px 18px;
+  display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
+  gap: 34px; background: #0b1325; border-right: 1px solid var(--border);
 }
-
-.dashboard-header h1 {
-    margin: 0;
-    color: var(--text);
-    font-size: 36px;
-    font-weight: 900;
-    letter-spacing: -0.6px;
+.dashboard-header h1 { margin: 0; font-size: 22px; line-height: 1.2; letter-spacing: -0.6px; color: var(--text); }
+.dashboard-container { width: 100%; max-width: 1600px; margin: 0 auto; padding: 38px 32px 50px; }
+.user-card, .add-crypto-card, .portfolio-card, .allocation-card, .transactions-section {
+  margin: 0 0 20px; padding: 25px; background: var(--card);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
 }
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    flex-shrink: 0;
+.user-card h2, .add-crypto-card h2, .portfolio-card h2, .allocation-card h2 {
+  margin: 0 0 18px; color: var(--text); font-size: 22px; letter-spacing: -0.4px;
 }
-
-
-/* ==================================================
-   MAIN CONTAINER
-================================================== */
-
-.dashboard-container {
-    width: 100%;
-    max-width: 1580px;
-    margin: 0 auto;
-    padding: 0 36px 40px;
+.header-actions { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.header-actions button { width: 100%; }
+#userInfo { color: var(--muted-dark); }
+.last-updated { margin-top: 10px; color: var(--muted); font-size: 13px; }
+.allocation-chart { display: flex; flex-direction: column; gap: 12px; }
+.allocation-row { width: 100%; padding: 14px 16px; background: var(--surface-soft); border: 1px solid var(--border); border-radius: 12px; }
+.allocation-info { display: grid; grid-template-columns: 72px 1fr auto; align-items: center; gap: 12px; margin-bottom: 10px; }
+.allocation-info .coin-symbol { display: inline-flex; align-items: center; justify-content: center; width: 64px; min-height: 32px; padding: 6px; border-radius: 999px; background: rgba(102,121,255,.14); color: #b3bcff; font-weight: 800; }
+.allocation-name { color: var(--muted-dark); font-weight: 650; }
+.allocation-percent { color: #aeb8ff; font-weight: 800; }
+.allocation-track { width: 100%; height: 8px; overflow: hidden; background: #090f21; border-radius: 999px; }
+.allocation-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #536dfa, #a271ff); }
+@media (max-width: 960px) {
+  body { padding: 0; }
+  .dashboard-header { position: relative; inset: auto; width: 100%; height: auto; padding: 18px 20px; gap: 14px; flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .dashboard-container { padding: 22px 18px 36px; }
+  .header-actions { flex-direction: row; flex-wrap: wrap; margin-left: auto; }
+  .header-actions button { width: auto; }
 }
-
-
-/* ==================================================
-   CARDS
-================================================== */
-
-.user-card,
-.add-crypto-card,
-.portfolio-card,
-.allocation-card {
-    margin: 0 0 24px;
-    padding: 28px;
-
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-}
-
-.user-card h2,
-.add-crypto-card h2,
-.portfolio-card h2,
-.allocation-card h2 {
-    margin-top: 0;
-    margin-bottom: 22px;
-
-    color: var(--text);
-    font-size: 26px;
-    font-weight: 900;
-    letter-spacing: -0.3px;
-}
-
-#userInfo {
-    color: #cbd5e1;
-    font-size: 17px;
-    font-weight: 600;
-}
-
-.last-updated {
-    margin-top: 10px;
-    color: var(--muted);
-    font-size: 14px;
-    font-weight: 600;
-}
-
-
-/* ==================================================
-   ALLOCATION
-================================================== */
-
-.allocation-card {
-    margin: 0 0 24px;
-    padding: 28px;
-
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-}
-
-.allocation-card h2 {
-    margin: 0 0 22px;
-
-    color: var(--text);
-    font-size: 26px;
-    font-weight: 900;
-    letter-spacing: -0.3px;
-}
-
-.allocation-chart {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.allocation-row {
-    display: block;
-
-    width: 100%;
-    padding: 16px 18px;
-
-    background: rgba(55, 65, 81, 0.72);
-    border: 1px solid rgba(148, 163, 184, 0.14);
-    border-radius: 16px;
-}
-
-.allocation-info {
-    display: grid;
-    grid-template-columns: 72px 1fr auto;
-    align-items: center;
-    gap: 12px;
-
-    width: 100%;
-    margin-bottom: 12px;
-}
-
-.allocation-info .coin-symbol {
-    width: 64px;
-    min-width: 64px;
-    height: 34px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0 12px;
-    margin: 0;
-
-    border-radius: 999px;
-    background: rgba(34, 197, 94, 0.14);
-    color: #86efac;
-
-    font-size: 16px;
-    font-weight: 900;
-    line-height: 1;
-}
-
-.allocation-name {
-    color: #cbd5e1;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.allocation-percent {
-    color: #93c5fd;
-    font-size: 16px;
-    font-weight: 900;
-    white-space: nowrap;
-}
-
-.allocation-track {
-    width: 100%;
-    height: 10px;
-
-    overflow: hidden;
-    background: rgba(15, 23, 42, 0.75);
-    border-radius: 999px;
-}
-
-.allocation-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--blue), var(--green));
-    border-radius: 999px;
-}
-
-/* ==================================================
-   FINAL OVERRIDE — DASHBOARD LAYOUT FIX
-================================================== */
-
-body {
-    padding-top: 116px !important;
-}
-
-/* Fixed header */
-.dashboard-header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 9999 !important;
-
-    width: 100% !important;
-    min-height: 96px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 24px !important;
-
-    padding: 24px 36px !important;
-    margin: 0 !important;
-
-    background: rgba(15, 23, 42, 0.96) !important;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
-
-    -webkit-backdrop-filter: blur(14px) !important;
-    backdrop-filter: blur(14px) !important;
-}
-
-.dashboard-header h1 {
-    margin: 0 !important;
-    color: var(--text) !important;
-    font-size: 36px !important;
-    font-weight: 900 !important;
-    letter-spacing: -0.6px !important;
-}
-
-.header-actions {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 12px !important;
-    flex-shrink: 0 !important;
-}
-
-.header-actions button {
-    width: auto !important;
-}
-
-/* Main page spacing */
-.dashboard-container {
-    width: 100% !important;
-    max-width: 1580px !important;
-    margin: 0 auto !important;
-    padding: 0 36px 40px !important;
-}
-
-/* Cards spacing */
-.user-card,
-.add-crypto-card,
-.portfolio-card,
-.allocation-card,
-.transactions-section {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-bottom: 24px !important;
-}
-
-/* Summary spacing */
-.summary-grid {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-bottom: 24px !important;
+@media (max-width: 640px) {
+  .dashboard-header { align-items: stretch; flex-direction: column; }
+  .header-actions { margin-left: 0; }
+  .dashboard-container { padding: 16px 12px 30px; }
+  .user-card, .add-crypto-card, .portfolio-card, .allocation-card, .transactions-section { padding: 18px; }
 }
