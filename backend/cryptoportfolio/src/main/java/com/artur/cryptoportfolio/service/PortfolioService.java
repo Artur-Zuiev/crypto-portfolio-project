@@ -283,8 +283,8 @@ public class PortfolioService {
                 item.getCryptoCurrency().getSymbol(),
                 item.getCryptoCurrency().getName(),
                 quantity,
-                round2(averageBuyPrice),
-                round2(currentPrice),
+                averageBuyPrice,
+                currentPrice,
                 round2(currentValue),
                 round2(profitLoss),
                 round2(allocationPercentage)
