@@ -88,6 +88,7 @@ public class TransactionService {
     @Transactional
     public TransactionResponse addSellTransaction(Long userId, AddTransactionRequest request) {
 
+        validateTransaction(request);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -176,7 +177,7 @@ public class TransactionService {
             return;
         }
 
-        existingItem.setQuantity(finalQuantity);
+        existingItem.setQuantity(finalQuantity.doubleValue());
         portfolioItemRepository.save(existingItem);
     }
 
