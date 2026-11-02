@@ -13,6 +13,8 @@ import com.artur.cryptoportfolio.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +64,7 @@ public class TransactionService {
     @Transactional
     public TransactionResponse addBuyTransaction(Long userId, AddTransactionRequest request) {
 
+        validateTransaction(request);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -100,7 +103,7 @@ public class TransactionService {
 
         PortfolioItem existingItem = items.get(0);
 
-        if (existingItem.getQuantity() < request.getQuantity()) {
+        if (decimal(existingItem.getQuantity()).compareTo(decimal(request.getQuantity())) < 0) {
             throw new RuntimeException("Not enough crypto to sell");
         }
 
@@ -148,13 +151,14 @@ public class TransactionService {
             Double oldQuantity = existingItem.getQuantity();
             Double oldAverageBuyPrice = existingItem.getAverageBuyPrice();
 
-            Double totalOldValue = oldQuantity * oldAverageBuyPrice;
-            Double totalNewValue = newQuantity * newBuyPrice;
+            BigDecimal totalOldValue = decimal(oldQuantity).multiply(decimal(oldAverageBuyPrice));
+            BigDecimal totalNewValue = decimal(newQuantity).multiply(decimal(newBuyPrice));
 
-            Double finalQuantity = oldQuantity + newQuantity;
-            Double finalAverageBuyPrice = (totalOldValue + totalNewValue) / finalQuantity;
+            BigDecimal finalQuantity = decimal(oldQuantity).add(decimal(newQuantity));
+            Double finalAverageBuyPrice = totalOldValue.add(totalNewValue)
+                    .divide(finalQuantity, MathContext.DECIMAL128).doubleValue();
 
-            existingItem.setQuantity(finalQuantity);
+            existingItem.setQuantity(finalQuantity.doubleValue());
             existingItem.setAverageBuyPrice(finalAverageBuyPrice);
 
             portfolioItemRepository.save(existingItem);
@@ -165,16 +169,28 @@ public class TransactionService {
         PortfolioItem existingItem,
         Double sellQuantity
     ) {
-        Double oldQuantity = existingItem.getQuantity();
-        Double finalQuantity = oldQuantity - sellQuantity;
+        BigDecimal finalQuantity = decimal(existingItem.getQuantity()).subtract(decimal(sellQuantity));
 
-        if (finalQuantity <= 0) {
+        if (finalQuantity.signum() <= 0) {
             portfolioItemRepository.delete(existingItem);
             return;
         }
 
         existingItem.setQuantity(finalQuantity);
         portfolioItemRepository.save(existingItem);
+    }
+
+    private static BigDecimal decimal(Double value) {
+        return BigDecimal.valueOf(value);
+    }
+
+    private static void validateTransaction(AddTransactionRequest request) {
+        if (request == null || request.getCryptoCurrencyId() == null
+                || request.getQuantity() == null || !Double.isFinite(request.getQuantity())
+                || request.getQuantity() <= 0 || request.getPrice() == null
+                || !Double.isFinite(request.getPrice()) || request.getPrice() <= 0) {
+            throw new IllegalArgumentException("A crypto, positive quantity and positive price are required");
+        }
     }
 
     private TransactionResponse mapToResponse(Transaction transaction) {
