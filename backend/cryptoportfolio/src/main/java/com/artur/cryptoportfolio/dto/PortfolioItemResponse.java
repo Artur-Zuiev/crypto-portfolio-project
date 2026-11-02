@@ -1,27 +1,29 @@
 package com.artur.cryptoportfolio.dto;
 
+import java.math.BigDecimal;
+
 public class PortfolioItemResponse {
     
     private Long id;
     private String symbol;
     private String name;
-    private Double quantity;
-    private Double averageBuyPrice;
-    private Double currentPrice;
-    private Double currentValue;
-    private Double profitLoss;
-    private Double allocationPercentage;
+    private BigDecimal quantity;
+    private BigDecimal averageBuyPrice;
+    private BigDecimal currentPrice;
+    private BigDecimal currentValue;
+    private BigDecimal profitLoss;
+    private BigDecimal allocationPercentage;
 
     public PortfolioItemResponse(
             Long id,
             String symbol,
             String name,
-            Double quantity,
-            Double averageBuyPrice,
-            Double currentPrice,
-            Double currentValue,
-            Double profitLoss,
-            Double allocationPercentage
+            BigDecimal quantity,
+            BigDecimal averageBuyPrice,
+            BigDecimal currentPrice,
+            BigDecimal currentValue,
+            BigDecimal profitLoss,
+            BigDecimal allocationPercentage
     ) {
         this.id = id;
         this.symbol = symbol;
@@ -46,27 +48,27 @@ public class PortfolioItemResponse {
         return name;
     }
 
-    public Double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public Double getAverageBuyPrice() {
+    public BigDecimal getAverageBuyPrice() {
         return averageBuyPrice;
     }
 
-    public Double getCurrentPrice() {
+    public BigDecimal getCurrentPrice() {
         return currentPrice;
     }
 
-    public Double getCurrentValue() {
+    public BigDecimal getCurrentValue() {
         return currentValue;
     }
 
-    public Double getProfitLoss() {
+    public BigDecimal getProfitLoss() {
         return profitLoss;
     }
 
-    public Double getAllocationPercentage() {
+    public BigDecimal getAllocationPercentage() {
         return allocationPercentage;
     }
 }
