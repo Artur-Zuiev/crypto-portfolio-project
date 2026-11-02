@@ -1196,7 +1196,7 @@ function formatPercent(value) {
 
 function formatNumber(value) {
     return new Intl.NumberFormat("de-DE", {
-        maximumFractionDigits: 8
+        maximumFractionDigits: 16
     }).format(value || 0);
 }
 
