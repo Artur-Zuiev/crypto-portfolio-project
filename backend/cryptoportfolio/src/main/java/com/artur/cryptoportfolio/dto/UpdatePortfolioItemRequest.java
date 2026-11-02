@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 public class UpdatePortfolioItemRequest {
 
     @NotNull(message = "Quantity is required")
-    @DecimalMin(value = "0.01", message = "Quantity must be greater than 0")
+    @DecimalMin(value = "0.000000000000000001", message = "Quantity must be greater than 0")
     private Double quantity;
 
     @NotNull(message = "Average buy price is required")
