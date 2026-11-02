@@ -629,34 +629,53 @@ function renderTransactions(transactions) {
 // ==================================================
 
 function renderAllocationChart(portfolio) {
-    if (!dom.allocationChart) {
+    if (!dom.allocationChart) return;
+
+    const entries = portfolio.map((item) => ({
+        symbol: item.symbol,
+        name: item.name,
+        share: Math.max(0, Number(item.allocationPercentage) || 0)
+    })).filter((item) => Number.isFinite(item.share) && item.share > 0);
+
+    if (!entries.length) {
+        dom.allocationChart.innerHTML = '<p class="empty-portfolio">No allocation data yet.</p>';
         return;
     }
 
-    if (!portfolio.length) {
-        dom.allocationChart.innerHTML = `<p class="empty-portfolio">No allocation data yet.</p>`;
-        return;
-    }
+    // Normalize the portfolio shares to make sure the ring always totals 100%.
+    const total = entries.reduce((sum, item) => sum + item.share, 0);
+    const colors = ['#ffb04e', '#657aff', '#30d9d0', '#b18aff', '#ff708b', '#8dd9ff'];
+    let cursor = 0;
+    const segments = entries.map((item, index) => {
+        const start = cursor;
+        cursor += item.share / total * 100;
+        return `${colors[index % colors.length]} ${start.toFixed(4)}% ${cursor.toFixed(4)}%`;
+    });
 
-    dom.allocationChart.innerHTML = portfolio.map((item) => {
-        const percentage = Number(item.allocationPercentage) || 0;
+    const chart = `<div class="allocation-visual">
+        <div class="allocation-donut" role="img"
+             aria-label="Portfolio distribution by asset"
+             style="background: conic-gradient(${segments.join(', ')})">
+            <div class="allocation-donut-center"><strong>${entries.length}</strong><span>Assets</span></div>
+        </div>
+    </div>`;
 
-        return `
-            <div class="allocation-row">
-                <div class="allocation-info">
-                    <span class="coin-symbol">${escapeHtml(item.symbol)}</span>
-                    <span class="allocation-name">${escapeHtml(item.name)}</span>
-                    <span class="allocation-percent">${formatNumber(percentage)}%</span>
-                </div>
-
-                <div class="allocation-track">
-                    <div class="allocation-fill" style="width: ${percentage}%"></div>
-                </div>
+    const legend = entries.map((item, index) => {
+        const percent = Math.min(100, item.share / total * 100);
+        return `<div class="allocation-row">
+            <div class="allocation-info">
+                <span class="coin-symbol" style="--allocation-color:${colors[index % colors.length]}">${escapeHtml(item.symbol)}</span>
+                <span class="allocation-name">${escapeHtml(item.name)}</span>
+                <span class="allocation-percent">${formatNumber(percent)}%</span>
             </div>
-        `;
-    }).join("");
-}
+            <div class="allocation-track">
+                <div class="allocation-fill" style="width:${percent.toFixed(4)}%;--allocation-color:${colors[index % colors.length]}"></div>
+            </div>
+        </div>`;
+    }).join('');
 
+    dom.allocationChart.innerHTML = chart + '<div class="allocation-legend">' + legend + '</div>';
+}
 
 // ==================================================
 // BLOCK 14 — PORTFOLIO FILTERS / ФИЛЬТРЫ ПОРТФЕЛЯ
