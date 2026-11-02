@@ -1,10 +1,12 @@
 package com.artur.cryptoportfolio.dto;
 
+import java.math.BigDecimal;
+
 public class AddTransactionRequest {
 
     private Long cryptoCurrencyId;
-    private Double quantity;
-    private Double price;
+    private BigDecimal quantity;
+    private BigDecimal price;
 
     public AddTransactionRequest() {
     }
@@ -17,19 +19,19 @@ public class AddTransactionRequest {
         this.cryptoCurrencyId = cryptoCurrencyId;
     }
     
-    public Double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 }
