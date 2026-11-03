@@ -1,27 +1,28 @@
 package com.artur.cryptoportfolio.dto;
+import java.math.BigDecimal;
 
 public class PortfolioSummaryResponse {
 
-    private Double totalValue;
-    private Double totalInvested;
-    private Double totalProfitLoss;
+    private BigDecimal totalValue;
+    private BigDecimal totalInvested;
+    private BigDecimal totalProfitLoss;
     private Integer assetCount;
 
     private String bestAssetSymbol;
-    private Double bestAssetProfitLoss;
+    private BigDecimal bestAssetProfitLoss;
 
     private String worstAssetSymbol;
-    private Double worstAssetProfitLoss;
+    private BigDecimal worstAssetProfitLoss;
 
     public PortfolioSummaryResponse(
-            Double totalValue,
-            Double totalInvested,
-            Double totalProfitLoss,
+            BigDecimal totalValue,
+            BigDecimal totalInvested,
+            BigDecimal totalProfitLoss,
             Integer assetCount,
             String bestAssetSymbol,
-            Double bestAssetProfitLoss,
+            BigDecimal bestAssetProfitLoss,
             String worstAssetSymbol,
-            Double worstAssetProfitLoss
+            BigDecimal worstAssetProfitLoss
     ) {
         this.totalValue = totalValue;
         this.totalInvested = totalInvested;
@@ -33,15 +34,15 @@ public class PortfolioSummaryResponse {
         this.worstAssetProfitLoss = worstAssetProfitLoss;
     }
 
-    public Double getTotalValue() {
+    public BigDecimal getTotalValue() {
         return totalValue;
     }
 
-    public Double getTotalInvested() {
+    public BigDecimal getTotalInvested() {
         return totalInvested;
     }
 
-    public Double getTotalProfitLoss() {
+    public BigDecimal getTotalProfitLoss() {
         return totalProfitLoss;
     }
 
@@ -53,7 +54,7 @@ public class PortfolioSummaryResponse {
         return bestAssetSymbol;
     }
 
-    public Double getBestAssetProfitLoss() {
+    public BigDecimal getBestAssetProfitLoss() {
         return bestAssetProfitLoss;
     }
 
@@ -61,7 +62,7 @@ public class PortfolioSummaryResponse {
         return worstAssetSymbol;
     }
 
-    public Double getWorstAssetProfitLoss() {
+    public BigDecimal getWorstAssetProfitLoss() {
         return worstAssetProfitLoss;
     }
 }

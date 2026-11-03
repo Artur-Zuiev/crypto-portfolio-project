@@ -1,5 +1,7 @@
 package com.artur.cryptoportfolio.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -25,10 +27,12 @@ public class Transaction {
      private String type;
 
      // Wie viel Cointen
-     private Double quantity;
+     @Column(precision = 38, scale = 18)
+    private BigDecimal quantity;
 
      // Price für ein Coint im Moment 
-     private Double price;
+     @Column(precision = 38, scale = 18)
+     private BigDecimal price;
 
      // Date von Operation
      private LocalDateTime transactionDate;
@@ -65,19 +69,19 @@ public class Transaction {
         this.type = type;
      }
 
-     public Double getQuantity() {
+     public BigDecimal getQuantity() {
         return quantity;
      }
 
-     public void setQuantity(Double quantity) {
+     public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
      }
 
-     public Double getPrice() {
+     public BigDecimal getPrice() {
         return price;
      }
 
-     public void setPrice(Double price) {
+     public void setPrice(BigDecimal price) {
         this.price = price;
      }
 

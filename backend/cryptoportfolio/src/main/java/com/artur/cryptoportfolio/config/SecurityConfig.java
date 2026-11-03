@@ -1,6 +1,8 @@
 package com.artur.cryptoportfolio.config;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,13 +49,21 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource(
+            @Value("${MOBILE_FRONTEND_ORIGIN:}") String mobileFrontendOrigin
+    ) {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
+        // Never enable wildcard origins: authenticated portfolio operations
+        // must only be callable from deliberately configured browser origins.
+        List<String> allowedOrigins = new ArrayList<>(List.of(
                 "http://127.0.0.1:5500",
                 "http://localhost:5500"
         ));
+        if (mobileFrontendOrigin != null && !mobileFrontendOrigin.isBlank()) {
+            allowedOrigins.add(mobileFrontendOrigin.trim());
+        }
+        configuration.setAllowedOrigins(allowedOrigins);
 
         configuration.setAllowedMethods(List.of(
                 "GET",

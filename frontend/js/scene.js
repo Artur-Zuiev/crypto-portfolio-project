@@ -16,6 +16,8 @@ const sceneTotalValue = document.getElementById("sceneTotalValue");
 const sceneStatus = document.getElementById("sceneStatus");
 const sceneAssetsList = document.getElementById("sceneAssetsList");
 const reloadSceneBtn = document.getElementById("reloadSceneBtn");
+const resetViewBtn = document.getElementById("resetViewBtn");
+const pauseMotionBtn = document.getElementById("pauseMotionBtn");
 
 const coinModal = document.getElementById("coinModal");
 const closeCoinModal = document.getElementById("closeCoinModal");
@@ -52,8 +54,11 @@ let modalOpenTimer = null;
 let pointerDownPosition = new THREE.Vector2();
 let pointerMovedDistance = 0;
 let isDraggingScene = false;
+let motionPaused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const API_URL = "http://localhost:8080";
+const API_URL = window.location.port === "5500"
+    ? `${window.location.protocol}//${window.location.hostname}:8080`
+    : `${window.location.origin}`;
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -74,6 +79,26 @@ loadPortfolioAndBuildScene();
 reloadSceneBtn.addEventListener("click", () => {
     loadPortfolioAndBuildScene();
 });
+
+function updateMotionButton() {
+    if (!pauseMotionBtn) return;
+    pauseMotionBtn.textContent = motionPaused ? "Resume motion" : "Pause motion";
+    pauseMotionBtn.setAttribute("aria-pressed", String(motionPaused));
+}
+updateMotionButton();
+pauseMotionBtn?.addEventListener("click", () => {
+    motionPaused = !motionPaused;
+    updateMotionButton();
+});
+resetViewBtn?.addEventListener("click", () => {
+    cameraTargetPosition = defaultCameraPosition.clone();
+    cameraLookAtTarget.copy(defaultControlsTarget);
+    coinModal?.classList.add("hidden");
+});
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") coinModal?.classList.add("hidden");
+});
+
 
 sceneAssetsList.addEventListener("click", (event) => {
     const assetRow = event.target.closest(".asset-row");
@@ -134,7 +159,7 @@ function initScene() {
     });
 
     renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.matchMedia("(max-width: 720px)").matches ? 1.4 : 2));
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -290,7 +315,7 @@ function addFloor() {
 // ==================================================
 
 function addParticles() {
-    const particlesCount = 340;
+    const particlesCount = window.matchMedia("(max-width: 720px)").matches ? 120 : 340;
     const positions = new Float32Array(particlesCount * 3);
 
     for (let i = 0; i < particlesCount; i++) {
@@ -1006,7 +1031,7 @@ function openCoinModal(data) {
     modalCoinQuantity.textContent = formatNumber(data.quantity);
     modalCoinPrice.textContent = formatCurrency(data.currentPrice);
     modalCoinValue.textContent = formatCurrency(data.value);
-    modalCoinProfit.textContent = formatCurrency(data.profitLoss);
+    modalCoinProfit.textContent = formatProfitCurrency(data.profitLoss);
 
     if (modalCoinProfitPercent) {
         modalCoinProfitPercent.textContent = formatPercent(data.profitPercent);
@@ -1196,7 +1221,7 @@ function formatPercent(value) {
 
 function formatNumber(value) {
     return new Intl.NumberFormat("de-DE", {
-        maximumFractionDigits: 8
+        maximumFractionDigits: 16
     }).format(value || 0);
 }
 
@@ -1228,11 +1253,30 @@ function getObjectDisplayColor(symbol, profitStatus) {
     return getColorBySymbol(symbol);
 }
 
+// All valuations and market prices use standard euro cents.
 function formatCurrency(value) {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
     return new Intl.NumberFormat("de-DE", {
         style: "currency",
-        currency: "EUR"
-    }).format(value || 0);
+        currency: "EUR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount);
+}
+
+// Only sub-cent profit/loss warrants extra display precision.
+function formatProfitCurrency(value) {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
+    if (amount === 0 || Math.abs(amount) >= 0.005) return formatCurrency(amount);
+    if (Math.abs(amount) < 0.000001) {
+        return amount < 0 ? "−<0,000001 €" : "<0,000001 €";
+    }
+    return `${amount.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+    })} €`;
 }
 
 function setStatus(text, type) {
@@ -1395,16 +1439,18 @@ function animate() {
 
     const time = performance.now() * 0.001;
 
-    if (particles) {
+    if (particles && !motionPaused) {
         particles.rotation.y += 0.0009;
         particles.rotation.x += 0.00025;
     }
 
     cryptoObjects.forEach((object) => {
-        object.rotation.y += object.userData.rotationSpeed || 0.004;
-        object.rotation.x += 0.0012;
+        if (!motionPaused) {
+            object.rotation.y += object.userData.rotationSpeed || 0.004;
+            object.rotation.x += 0.0012;
+        }
 
-        if (typeof object.userData.baseY === "number") {
+        if (typeof object.userData.baseY === "number" && !motionPaused) {
             object.position.y =
                 object.userData.baseY +
                 Math.sin(time * 1.2 + object.userData.floatOffset) * 0.12;

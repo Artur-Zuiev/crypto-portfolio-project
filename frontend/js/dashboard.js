@@ -8,7 +8,9 @@
 // Адрес backend-сервера и общие параметры страницы.
 // ==================================================
 
-const API_URL = "http://localhost:8080/api";
+const API_URL = window.location.port === "5500"
+    ? `${window.location.protocol}//${window.location.hostname}:8080/api`
+    : `${window.location.origin}/api`;
 const PRICE_REFRESH_INTERVAL_MINUTES = 5;
 const token = localStorage.getItem("token");
 
@@ -166,16 +168,50 @@ function apiSend(path, method, body = null) {
 // Деньги, числа, даты и проверка свежести цены.
 // ==================================================
 
+// Monetary values are always shown in euro cents. Financial computations
+// retain their original backend precision; this is only presentation.
 function formatEuro(value) {
-    return `${Number(value || 0).toLocaleString("de-DE", {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
+    return `${amount.toLocaleString("de-DE", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     })} €`;
 }
 
+// For gains/losses smaller than one cent, extra digits prevent a real
+// gain or loss from appearing as zero. Limit decimals to avoid UI overflow.
+function formatProfitEuro(value) {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
+    if (amount === 0 || Math.abs(amount) >= 0.005) return formatEuro(amount);
+    if (Math.abs(amount) < 0.000001) {
+        return amount < 0 ? "−<0,000001 €" : "<0,000001 €";
+    }
+    return `${amount.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+    })} €`;
+}
+
+function fullPrecisionEuro(value) {
+    const amount = Number(value ?? 0);
+    return Number.isFinite(amount)
+        ? `${amount.toLocaleString("de-DE", { maximumFractionDigits: 18 })} €`
+        : "—";
+}
+
 function formatNumber(value) {
     return Number(value || 0).toLocaleString("de-DE", {
-        maximumFractionDigits: 8
+        maximumFractionDigits: 16
+    });
+}
+
+function formatPercent(value) {
+    const percent = Number(value);
+    return (Number.isFinite(percent) ? percent : 0).toLocaleString("de-DE", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
     });
 }
 
@@ -301,19 +337,40 @@ function renderLastUpdated() {
 }
 
 function updateCryptoSelectPrices() {
-    if (!dom.cryptoSelect) {
-        return;
-    }
+    if (!dom.cryptoSelect) return;
+
+    // Coin identifiers must come from the database, not hard-coded option IDs.
+    // This also works after users reset PostgreSQL and the IDs change.
+    const previousSymbol = getSelectedCryptoSymbol();
+    const placeholder = new Option("Choose crypto", "");
+    dom.cryptoSelect.replaceChildren(placeholder);
 
     for (const crypto of state.cryptoList) {
-        const option = [...dom.cryptoSelect.options].find((item) => item.dataset.symbol === crypto.symbol);
-
-        if (option) {
-            option.dataset.price = crypto.currentPrice;
-        }
+        const option = new Option(`${crypto.symbol} - ${crypto.name}`, String(crypto.id));
+        option.dataset.symbol = crypto.symbol;
+        option.dataset.name = crypto.name;
+        option.dataset.price = String(crypto.currentPrice ?? 0);
+        dom.cryptoSelect.add(option);
     }
 
+    const matching = [...dom.cryptoSelect.options].find(option => option.dataset.symbol === previousSymbol);
+    if (matching) dom.cryptoSelect.value = matching.value;
+
+    // Existing custom dropdown buttons remain, but use database IDs.
+    dom.cryptoDropdownOptions.forEach(button => {
+        const symbol = button.querySelector(".crypto-option-icon")?.textContent?.trim();
+        const coin = state.cryptoList.find(item => item.symbol === symbol);
+        button.dataset.value = coin ? String(coin.id) : "";
+        button.disabled = !coin;
+    });
+
+    updateCustomCryptoDropdown();
     updateSelectedCryptoPriceInfo();
+    const price = getSelectedCryptoPrice();
+    if (price > 0 && dom.priceInput && !dom.priceInput.value) {
+        dom.priceInput.value = price;
+        updateTransactionPreview();
+    }
 }
 
 async function autoRefreshPricesIfNeeded() {
@@ -334,15 +391,20 @@ async function refreshPrices({ silent = false } = {}) {
         setButtonLoading(dom.refreshPricesBtn, true, "Updating...", "Refresh Prices");
         await apiSend("/crypto/update-prices", "POST");
 
+        await reloadDashboardData({ includeCrypto: true, includeTransactions: true });
+
         if (!silent) {
             showMessage("Prices updated successfully", "success");
         }
-
-        await reloadDashboardData({ includeCrypto: true, includeTransactions: true });
     } catch (error) {
-        if (!silent) {
-            showMessage("Could not refresh prices", "error");
+        // The API can initialize the coin list even when CoinGecko is unavailable.
+        // Reload it so the selector uses real database IDs, never hard-coded ones.
+        try {
+            await loadCryptoList();
+        } catch (reloadError) {
+            console.error("Coin list reload failed:", reloadError);
         }
+        showMessage(error.message || "Could not refresh prices", "error");
         console.error(error);
     } finally {
         setButtonLoading(dom.refreshPricesBtn, false, "Updating...", "Refresh Prices");
@@ -364,8 +426,11 @@ async function loadSummary() {
         if (dom.assetCount) dom.assetCount.textContent = summary.assetCount || 0;
 
         setProfitText(dom.totalProfitLoss, summary.totalProfitLoss);
-        setCoinResult(dom.bestCoin, summary.bestAssetSymbol, summary.bestAssetProfitLoss);
-        setCoinResult(dom.worstCoin, summary.worstAssetSymbol, summary.worstAssetProfitLoss);
+        setCoinResult(dom.bestCoin, summary.bestAssetSymbol, summary.bestAssetProfitLoss, "No gains yet", "No assets yet", summary.assetCount);
+        setCoinResult(dom.worstCoin, summary.worstAssetSymbol, summary.worstAssetProfitLoss, "No losses yet", "No assets yet", summary.assetCount);
+        saveObservedValue(summary.totalValue);
+        renderValueHistory();
+        await loadRealizedPerformance(summary.totalProfitLoss);
     } catch (error) {
         [dom.totalValue, dom.totalInvested, dom.totalProfitLoss, dom.assetCount, dom.bestCoin, dom.worstCoin]
             .forEach((element) => {
@@ -376,22 +441,149 @@ async function loadSummary() {
     }
 }
 
+// ==================================================
+// RECORDED PERFORMANCE / TRADE ACCOUNTING
+// ==================================================
+
+async function loadRealizedPerformance(unrealizedValue) {
+    const realizedNode = $("#realizedProfitLoss");
+    const combinedNode = $("#combinedProfitLoss");
+    const note = $("#realizedProfitNote");
+
+    try {
+        const data = await apiGet("/portfolio/performance/realized");
+        if (!data) return;
+        const realized = Number(data.realizedProfitLoss ?? 0);
+        const unmatched = Number(data.unmatchedSales ?? 0);
+        // Do not publish a misleading combined total when cost history is incomplete.
+        if (unmatched > 0) {
+            if (realizedNode) realizedNode.textContent = "Incomplete history";
+            if (combinedNode) combinedNode.textContent = "—";
+            if (note) note.textContent = `${unmatched} sale(s) cannot be matched to recorded buys`;
+            return;
+        }
+        setProfitText(realizedNode, realized);
+        setProfitText(combinedNode, realized + Number(unrealizedValue || 0));
+        if (note) note.textContent = `${data.completedSales ?? 0} recorded sale(s), weighted-average cost`;
+    } catch (error) {
+        if (realizedNode) realizedNode.textContent = "Unavailable";
+        if (combinedNode) combinedNode.textContent = "—";
+        if (note) note.textContent = "Could not load trade performance";
+        console.error("Realized profit unavailable:", error);
+    }
+}
+
+// This is NOT a reconstruction of historical market prices. Each point is a real
+// value observed while the dashboard was open. Data is browser-local and
+// isolated per logged-in account; no historical prices are invented.
+function valueHistoryStorageKey() {
+    const email = dom.userEmail?.textContent?.trim() || "";
+    if (!email || email === "No email" || email === "Server error") return null;
+    return `crypto-portfolio-observations-v1:${email}`;
+}
+
+function getObservedValues() {
+    const key = valueHistoryStorageKey();
+    if (!key) return [];
+    try {
+        const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(entry => Number.isFinite(entry?.at) &&
+            Number.isFinite(entry?.value) && entry.value >= 0);
+    } catch { return []; }
+}
+
+function saveObservedValue(totalValue) {
+    const key = valueHistoryStorageKey();
+    const amount = Number(totalValue);
+    if (!key || !Number.isFinite(amount) || amount < 0) return;
+    try {
+        const list = getObservedValues();
+        const now = Date.now();
+        const last = list[list.length - 1];
+        // Record price movements at most once per minute; record unchanged
+        // values only every 10 minutes to avoid flooding localStorage.
+        if (last && now - last.at < 60000) return;
+        if (last && now - last.at < 600000 && Math.abs(last.value - amount) < 0.00000001) return;
+        const cutoff = now - 90 * 86400000;
+        const history = [...list, { at: now, value: amount }]
+            .filter(entry => entry.at >= cutoff).slice(-360);
+        localStorage.setItem(key, JSON.stringify(history));
+    } catch (error) {
+        console.warn("Could not save local value observation", error);
+    }
+}
+
+function renderValueHistory() {
+    const node = $("#portfolioHistoryGraph");
+    const counter = $("#historySampleCount");
+    if (!node) return;
+    const entries = getObservedValues();
+    if (counter) counter.textContent = `${entries.length} observation${entries.length === 1 ? "" : "s"}`;
+    if (entries.length < 2) {
+        node.innerHTML = '<p class="performance-chart-empty">Your value history starts now. Open or refresh the dashboard later to collect more observations.</p>';
+        return;
+    }
+
+    const width = 900, height = 260;
+    const left = 76, right = 24, top = 24, bottom = 46;
+    const plotWidth = width - left - right, plotHeight = height - top - bottom;
+    const start = entries[0].at, end = entries[entries.length - 1].at;
+    const rawMin = Math.min(...entries.map(point => point.value));
+    const rawMax = Math.max(...entries.map(point => point.value));
+    const padding = Math.max((rawMax - rawMin) * 0.12, Math.max(rawMax, 1) * 0.004);
+    const min = Math.max(0, rawMin - padding), max = rawMax + padding;
+    const x = point => left + (point.at - start) / Math.max(end - start, 1) * plotWidth;
+    const y = point => top + (max - point.value) / Math.max(max - min, 0.00001) * plotHeight;
+    const coords = entries.map(point => [x(point), y(point)]);
+    const line = coords.map(([px, py], i) => `${i === 0 ? "M" : "L"}${px.toFixed(2)},${py.toFixed(2)}`).join(" ");
+    const floor = height - bottom;
+    const area = `${line} L${coords[coords.length - 1][0].toFixed(2)},${floor} L${coords[0][0].toFixed(2)},${floor} Z`;
+    const grid = Array.from({ length: 4 }, (_, i) => {
+        const value = min + (max - min) * i / 3;
+        const py = top + (3 - i) / 3 * plotHeight;
+        return `<line class="chart-grid" x1="${left}" y1="${py}" x2="${width - right}" y2="${py}"/>` +
+            `<text x="${left - 12}" y="${py + 4}" text-anchor="end">${formatEuro(value)}</text>`;
+    }).join("");
+    const dates = [entries[0], entries[entries.length - 1]].map(point =>
+        `<text x="${x(point)}" y="${height - 16}" text-anchor="${point === entries[0] ? "start" : "end"}">${new Date(point.at).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</text>`
+    ).join("");
+    const latest = coords[coords.length - 1];
+    node.innerHTML = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="value-history-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#668bff" stop-opacity=".26"/>
+          <stop offset="100%" stop-color="#668bff" stop-opacity="0"/>
+        </linearGradient></defs>
+        ${grid}<path class="chart-area" d="${area}"/>
+        <path class="chart-line" d="${line}"/>
+        <circle class="chart-point" cx="${latest[0]}" cy="${latest[1]}" r="5"/>
+        ${dates}</svg>`;
+    node.setAttribute("aria-label", `Portfolio value observations from ${formatEuro(entries[0].value)} to ${formatEuro(entries[entries.length - 1].value)}`);
+}
+
 function setProfitText(element, value) {
     if (!element) {
         return;
     }
 
-    element.textContent = formatEuro(value);
+    element.textContent = formatProfitEuro(value);
+    element.title = `Exact result: ${fullPrecisionEuro(value)}`;
     element.className = Number(value || 0) >= 0 ? "profit" : "loss";
 }
 
-function setCoinResult(element, symbol, profitLoss) {
-    if (!element) {
+function setCoinResult(element, symbol, profitLoss, noResultText = "No change yet", emptyText = "No assets yet", assetCount = 0) {
+    if (!element) return;
+
+    const result = Number(profitLoss || 0);
+    if (!symbol || symbol === "-" || !Number.isFinite(result) || result === 0) {
+        element.textContent = Number(assetCount) > 0 ? noResultText : emptyText;
+        element.className = "";
         return;
     }
 
-    element.textContent = `${symbol || "-"} ${formatEuro(profitLoss)}`;
-    element.className = Number(profitLoss || 0) >= 0 ? "profit" : "loss";
+    element.textContent = `${symbol} ${formatProfitEuro(result)}`;
+    element.title = `Exact result: ${fullPrecisionEuro(result)}`;
+    element.className = result > 0 ? "profit" : "loss";
 }
 
 
@@ -613,9 +805,9 @@ function renderTransactions(transactions) {
                 </div>
 
                 <div class="transaction-right">
-                    <div class="transaction-quantity">${formatNumber(transaction.quantity)} ${escapeHtml(transaction.cryptoSymbol)}</div>
-                    <div class="transaction-price">${formatEuro(transaction.price)} per coin</div>
-                    <div class="transaction-total">${formatEuro(transaction.totalValue)}</div>
+                    <div class="transaction-quantity" data-label="Quantity">${formatNumber(transaction.quantity)} ${escapeHtml(transaction.cryptoSymbol)}</div>
+                    <div class="transaction-price" data-label="Price per coin">${formatEuro(transaction.price)} per coin</div>
+                    <div class="transaction-total" data-label="Total">${formatEuro(transaction.totalValue)}</div>
                 </div>
             </div>
         `;
@@ -629,34 +821,53 @@ function renderTransactions(transactions) {
 // ==================================================
 
 function renderAllocationChart(portfolio) {
-    if (!dom.allocationChart) {
+    if (!dom.allocationChart) return;
+
+    const entries = portfolio.map((item) => ({
+        symbol: item.symbol,
+        name: item.name,
+        share: Math.max(0, Number(item.allocationPercentage) || 0)
+    })).filter((item) => Number.isFinite(item.share) && item.share > 0);
+
+    if (!entries.length) {
+        dom.allocationChart.innerHTML = '<p class="empty-portfolio">No allocation data yet.</p>';
         return;
     }
 
-    if (!portfolio.length) {
-        dom.allocationChart.innerHTML = `<p class="empty-portfolio">No allocation data yet.</p>`;
-        return;
-    }
+    // Normalize the portfolio shares to make sure the ring always totals 100%.
+    const total = entries.reduce((sum, item) => sum + item.share, 0);
+    const colors = ['#ffb04e', '#657aff', '#30d9d0', '#b18aff', '#ff708b', '#8dd9ff'];
+    let cursor = 0;
+    const segments = entries.map((item, index) => {
+        const start = cursor;
+        cursor += item.share / total * 100;
+        return `${colors[index % colors.length]} ${start.toFixed(4)}% ${cursor.toFixed(4)}%`;
+    });
 
-    dom.allocationChart.innerHTML = portfolio.map((item) => {
-        const percentage = Number(item.allocationPercentage) || 0;
+    const chart = `<div class="allocation-visual">
+        <div class="allocation-donut" role="img"
+             aria-label="Portfolio distribution by asset"
+             style="background: conic-gradient(${segments.join(', ')})">
+            <div class="allocation-donut-center"><strong>${entries.length}</strong><span>Assets</span></div>
+        </div>
+    </div>`;
 
-        return `
-            <div class="allocation-row">
-                <div class="allocation-info">
-                    <span class="coin-symbol">${escapeHtml(item.symbol)}</span>
-                    <span class="allocation-name">${escapeHtml(item.name)}</span>
-                    <span class="allocation-percent">${formatNumber(percentage)}%</span>
-                </div>
-
-                <div class="allocation-track">
-                    <div class="allocation-fill" style="width: ${percentage}%"></div>
-                </div>
+    const legend = entries.map((item, index) => {
+        const percent = Math.min(100, item.share / total * 100);
+        return `<div class="allocation-row">
+            <div class="allocation-info">
+                <span class="coin-symbol" style="--allocation-color:${colors[index % colors.length]}">${escapeHtml(item.symbol)}</span>
+                <span class="allocation-name">${escapeHtml(item.name)}</span>
+                <span class="allocation-percent">${formatPercent(percent)}%</span>
             </div>
-        `;
-    }).join("");
-}
+            <div class="allocation-track">
+                <div class="allocation-fill" style="width:${percent.toFixed(4)}%;--allocation-color:${colors[index % colors.length]}"></div>
+            </div>
+        </div>`;
+    }).join('');
 
+    dom.allocationChart.innerHTML = chart + '<div class="allocation-legend">' + legend + '</div>';
+}
 
 // ==================================================
 // BLOCK 14 — PORTFOLIO FILTERS / ФИЛЬТРЫ ПОРТФЕЛЯ
@@ -780,15 +991,15 @@ function renderPortfolioList() {
 
     dom.portfolioList.innerHTML = visiblePortfolio.map((item) => `
         <div class="portfolio-item">
-            <span class="coin-symbol">${escapeHtml(item.symbol)}</span>
-            <span>${escapeHtml(item.name)}</span>
-            <span>${formatNumber(item.quantity)}</span>
-            <span>${formatEuro(item.averageBuyPrice)}</span>
-            <span>${formatEuro(item.currentPrice)}</span>
-            <span>${formatEuro(item.currentValue)}</span>
-            <span class="${item.profitLoss >= 0 ? "profit" : "loss"}">${formatEuro(item.profitLoss)}</span>
-            <span class="allocation-badge">${formatNumber(item.allocationPercentage)}%</span>
-            <div class="action-buttons">
+            <span class="coin-symbol" data-label="Symbol">${escapeHtml(item.symbol)}</span>
+            <span data-label="Name">${escapeHtml(item.name)}</span>
+            <span data-label="Quantity">${formatNumber(item.quantity)}</span>
+            <span data-label="Buy price">${formatEuro(item.averageBuyPrice)}</span>
+            <span data-label="Current price">${formatEuro(item.currentPrice)}</span>
+            <span data-label="Value">${formatEuro(item.currentValue)}</span>
+            <span data-label="Profit / Loss" class="${item.profitLoss >= 0 ? "profit" : "loss"}">${formatProfitEuro(item.profitLoss)}</span>
+            <span data-label="Allocation" class="allocation-badge">${formatPercent(item.allocationPercentage)}%</span>
+            <div class="action-buttons" aria-label="Asset actions">
                 <button class="edit-btn" data-action="edit" data-id="${item.id}">Edit</button>
                 <button class="delete-btn" data-action="delete" data-id="${item.id}">Delete</button>
             </div>
@@ -1025,8 +1236,8 @@ function handleCryptoSelectChange() {
 
     const currentPrice = getSelectedCryptoPrice();
 
-    if (currentPrice > 0 && dom.priceInput) {
-        dom.priceInput.value = currentPrice;
+    if (dom.priceInput) {
+        dom.priceInput.value = currentPrice > 0 ? currentPrice : "";
     }
 
     updateTransactionPreview();

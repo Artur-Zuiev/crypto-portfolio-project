@@ -369,6 +369,23 @@ body::before {
     border-bottom: 1px solid rgba(112, 139, 180, 0.18);
 }
 
+.scene-toolbar-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+.scene-toolbar-actions #resetViewBtn,
+.scene-toolbar-actions #pauseMotionBtn {
+    cursor: pointer; border-radius: 999px; padding: 12px 15px;
+    font: 800 13px Arial, sans-serif; color: #dce9ff;
+    background: rgba(33,55,92,.64); border: 1px solid rgba(150,180,225,.29);
+    transition: background .2s ease, border-color .2s ease;
+}
+.scene-toolbar-actions #resetViewBtn:hover,
+.scene-toolbar-actions #pauseMotionBtn:hover { background: rgba(54,81,130,.75); border-color: rgba(150,190,255,.64); }
+.scene-toolbar-actions button:focus-visible { outline: 3px solid #77b5ff; outline-offset: 3px; }
+.scene-toolbar-actions #pauseMotionBtn[aria-pressed="true"] { color: #80e5d5; border-color: rgba(26,190,160,.6); }
+@media (max-width: 740px) {
+    .scene-toolbar { flex-wrap: wrap; }
+    .scene-toolbar-actions { justify-content: flex-start; }
+}
+
 .toolbar-small {
     margin: 0 0 4px;
 
@@ -500,28 +517,83 @@ body::before {
 }
 
 @media (max-width: 720px) {
-    .scene-header,
-    .scene-page {
-        width: min(100% - 24px, 1440px);
+    html, body { width: 100%; overflow-x: clip; }
+    .scene-header, .scene-page {
+        width: calc(100% - 24px);
+        max-width: 1440px;
     }
-
+    .scene-header {
+        margin-top: calc(12px + env(safe-area-inset-top, 0px));
+        padding: 18px 16px;
+        gap: 15px;
+        border-radius: 19px;
+    }
+    .scene-header h1 { font-size: clamp(26px, 8vw, 38px); }
     .scene-nav {
-        width: 100%;
-        overflow-x: auto;
+        width: 100%; min-width: 0;
+        display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px; overflow: visible;
     }
-
+    .scene-nav a {
+        display: flex; justify-content: center; align-items: center;
+        min-width: 0; min-height: 44px; padding: 8px 5px;
+        text-align: center; font-size: clamp(11px, 3vw, 13px);
+        line-height: 1.2; overflow-wrap: anywhere;
+    }
+    .scene-page {
+        display: flex; flex-direction: column;
+        margin-top: 14px;
+        margin-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+        gap: 14px;
+    }
     .scene-panel {
-        grid-template-columns: 1fr;
+        display: grid; grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
     }
-
+    .panel-card { padding: 15px; border-radius: 16px; min-width: 0; }
+    .panel-card h2 { font-size: 29px; overflow-wrap: anywhere; }
+    .assets-list { gap: 8px; }
+    .asset-row { min-height: 52px; padding: 12px; }
+    .asset-row-button { touch-action: manipulation; }
+    .scene-wrapper { min-height: 0; border-radius: 18px; }
     .scene-toolbar {
-        align-items: flex-start;
-        flex-direction: column;
+        flex-direction: column; align-items: stretch;
+        padding: 16px; gap: 12px;
     }
-
+    .scene-toolbar h2 { font-size: 21px; }
+    .scene-toolbar-actions {
+        width: 100%; display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+    }
+    .scene-toolbar-actions button,
+    #reloadSceneBtn { min-width: 0; min-height: 44px; padding: 10px 7px; font-size: 11px; }
     .three-container {
-        height: 520px;
+        height: clamp(340px, 58dvh, 570px);
+        width: 100%;
+        touch-action: none; /* OrbitControls pinch to zoom and one-finger orbit */
     }
+    .crypto-label { min-width: 82px; max-width: 112px; padding: 5px 7px; }
+    .crypto-label strong { font-size: 12px; }
+    .crypto-label span { font-size: 10px; }
+    .coin-modal {
+        align-items: flex-end; padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+    .coin-modal-card {
+        width: 100%; max-height: min(78dvh, 700px);
+        overflow-y: auto; overscroll-behavior: contain;
+        padding: 24px 18px; border-radius: 20px;
+    }
+    .coin-modal-card h2 { font-size: 32px; }
+    .coin-modal-close { width: 44px; height: 44px; right: 12px; top: 12px; }
+    .modal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .modal-grid div { padding: 12px; min-width: 0; }
+    .modal-grid strong { font-size: 14px; overflow-wrap: anywhere; }
+}
+@media (max-width: 360px) {
+    .modal-grid { grid-template-columns: 1fr; }
+    .scene-toolbar-actions { grid-template-columns: 1fr 1fr; }
+    #reloadSceneBtn { grid-column: 1 / -1; }
 }
 
 
@@ -635,8 +707,3 @@ body::before {
     font-size: 18px;
 }
 
-@media (max-width: 520px) {
-    .modal-grid {
-        grid-template-columns: 1fr;
-    }
-}

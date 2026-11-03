@@ -1,8 +1,11 @@
 package com.artur.cryptoportfolio.dto;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.DecimalMin;
+
+import jakarta.validation.constraints.NotBlank;
 
 public class AddPortfolioItemRequest {
 
@@ -10,12 +13,14 @@ public class AddPortfolioItemRequest {
     private String symbol;
 
     @NotNull(message = "Quantity is required")
-    @DecimalMin(value = "0.01", message = "Quantity must be greater than 0")
-    private Double quantity;
+    @DecimalMin(value = "0.000000000000000001", message = "Quantity must be greater than 0")
+    @Digits(integer = 20, fraction = 18)
+    private BigDecimal quantity;
 
     @NotNull(message = "Average buy price is required")
-    @DecimalMin(value = "0.01", message = "Average buy price must be greater than 0")
-    private Double averageBuyPrice;
+    @DecimalMin(value = "0.000000000000000001", message = "Average buy price must be greater than 0")
+    @Digits(integer = 20, fraction = 18)
+    private BigDecimal averageBuyPrice;
 
     public String getSymbol() {
         return symbol;
@@ -25,19 +30,19 @@ public class AddPortfolioItemRequest {
         this.symbol = symbol;
     }
 
-    public Double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
-    public Double getAverageBuyPrice() {
+    public BigDecimal getAverageBuyPrice() {
         return averageBuyPrice;
     }
 
-    public void setAverageBuyPrice(Double averageBuyPrice) {
+    public void setAverageBuyPrice(BigDecimal averageBuyPrice) {
         this.averageBuyPrice = averageBuyPrice;
     }
 }

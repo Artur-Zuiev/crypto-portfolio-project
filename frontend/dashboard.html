@@ -25,6 +25,7 @@
         <nav class="dashboard-nav">
             <a href="dashboard.html" class="dashboard-nav-link active">Dashboard</a>
             <a href="scene.html" class="dashboard-nav-link">3D Dashboard</a>
+            <a href="transactions.html" class="dashboard-nav-link">Transactions</a>
         </nav>
 
         <div class="header-actions">
@@ -72,7 +73,7 @@
             </div>
 
             <div class="summary-card">
-                <h3>Profit / Loss</h3>
+                <h3>Unrealized P/L</h3>
                 <p id="totalProfitLoss">0</p>
             </div>
 
@@ -90,6 +91,29 @@
                 <h3>Worst Coin</h3>
                 <p id="worstCoin">-</p>
             </div>
+                    <div class="summary-card">
+                <h3>Realized P/L</h3>
+                <p id="realizedProfitLoss">—</p>
+                <small id="realizedProfitNote" class="performance-note">Based on recorded sales</small>
+            </div>
+
+            <div class="summary-card">
+                <h3>Combined P/L</h3>
+                <p id="combinedProfitLoss">—</p>
+                <small class="performance-note">Realized + unrealized</small>
+            </div>
+</section>
+
+        <section class="performance-history" aria-labelledby="portfolioHistoryHeading">
+            <div class="performance-history-heading">
+                <div>
+                    <p class="performance-eyebrow">PORTFOLIO TREND</p>
+                    <h2 id="portfolioHistoryHeading">Value history</h2>
+                    <p class="performance-note">Observed portfolio values saved in this browser, not historical market-price estimates.</p>
+                </div>
+                <span id="historySampleCount" class="performance-samples">0 observations</span>
+            </div>
+            <div id="portfolioHistoryGraph" class="performance-chart" role="img" aria-label="Portfolio value history chart"></div>
         </section>
 
         <!-- ================================================== -->

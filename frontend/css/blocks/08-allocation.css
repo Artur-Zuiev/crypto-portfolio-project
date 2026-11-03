@@ -1,109 +1,40 @@
-/* ==================================================
-   BLOCK 08 — PORTFOLIO ALLOCATION / РАСПРЕДЕЛЕНИЕ ПОРТФЕЛЯ
-   Что здесь: карточка Portfolio Allocation, строки распределения,
-   coin badge, процент, progress bar.
-   Используется: dashboard.html → .allocation-card
-================================================== */
-
-/* ==================================================
-   FINAL OVERRIDE — ALLOCATION FIX
-================================================== */
-
+/* Portfolio allocation — rendered from the user's actual positions. */
 .allocation-card {
-    display: block !important;
-    margin: 0 0 24px !important;
-    padding: 28px !important;
-
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: var(--shadow) !important;
+  margin: 0 0 22px;
+  padding: 25px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
-
-.allocation-card h2 {
-    margin: 0 0 22px !important;
-    color: var(--text) !important;
-    font-size: 26px !important;
-    font-weight: 900 !important;
+.allocation-card h2 { margin: 0 0 20px; font-size: 22px; letter-spacing: -.4px; }
+.allocation-chart { display: grid; grid-template-columns: minmax(180px, .8fr) minmax(250px, 1.2fr); gap: 26px; align-items: center; }
+.allocation-visual { display: flex; justify-content: center; align-items: center; }
+.allocation-donut {
+  width: min(100%, 260px); aspect-ratio: 1; display: grid; place-items: center;
+  border-radius: 50%; box-shadow: 0 0 36px rgba(93, 106, 230, .12);
 }
-
-.allocation-chart {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 14px !important;
+.allocation-donut-center {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 69%; height: 69%; border-radius: 50%; background: #111b30;
+  color: #f4f7ff; box-shadow: inset 0 0 0 1px rgba(157,176,220,.12);
 }
-
-.allocation-row {
-    display: block !important;
-    width: 100% !important;
-
-    padding: 16px 18px !important;
-    margin: 0 !important;
-
-    background: rgba(55, 65, 81, 0.72) !important;
-    border: 1px solid rgba(148, 163, 184, 0.14) !important;
-    border-radius: 16px !important;
-}
-
-.allocation-info {
-    display: grid !important;
-    grid-template-columns: 72px 1fr auto !important;
-    align-items: center !important;
-    gap: 12px !important;
-
-    width: 100% !important;
-    min-height: 38px !important;
-    margin: 0 0 12px !important;
-}
-
+.allocation-donut-center strong { font-size: clamp(28px,3vw,40px); letter-spacing: -1px; }
+.allocation-donut-center span { color: var(--muted); font-size: 13px; }
+.allocation-legend { display: grid; gap: 10px; min-width: 0; }
+.allocation-row { min-width: 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-soft); }
+.allocation-info { display: grid; grid-template-columns: 66px minmax(0,1fr) auto; gap: 12px; align-items: center; margin-bottom: 10px; }
 .allocation-info .coin-symbol {
-    width: 64px !important;
-    min-width: 64px !important;
-    height: 34px !important;
-
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    padding: 0 12px !important;
-    margin: 0 !important;
-
-    border-radius: 999px !important;
-    background: rgba(34, 197, 94, 0.14) !important;
-    color: #86efac !important;
-
-    font-size: 16px !important;
-    font-weight: 900 !important;
-    line-height: 1 !important;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 62px; min-height: 28px; padding: 4px; border-radius: 8px;
+  background: color-mix(in srgb, var(--allocation-color), transparent 84%);
+  color: var(--allocation-color); font-size: 13px; font-weight: 800;
 }
-
-.allocation-name {
-    color: #cbd5e1 !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-}
-
-.allocation-percent {
-    color: #93c5fd !important;
-    font-size: 16px !important;
-    font-weight: 900 !important;
-    white-space: nowrap !important;
-}
-
-.allocation-track {
-    display: block !important;
-    width: 100% !important;
-    height: 10px !important;
-
-    overflow: hidden !important;
-    background: rgba(15, 23, 42, 0.75) !important;
-    border-radius: 999px !important;
-}
-
-.allocation-fill {
-    display: block !important;
-    height: 100% !important;
-    background: linear-gradient(90deg, var(--blue), var(--green)) !important;
-    border-radius: 999px !important;
+.allocation-name { color: #d6dfed; font-size: 14px; font-weight: 650; overflow-wrap: anywhere; }
+.allocation-percent { color: #e5eaff; font-size: 13px; font-weight: 800; white-space: nowrap; }
+.allocation-track { height: 6px; background: #0a1325; overflow: hidden; border-radius: 999px; }
+.allocation-fill { height: 100%; border-radius: inherit; background: var(--allocation-color); }
+@media (max-width: 760px) {
+  .allocation-chart { grid-template-columns: 1fr; gap: 24px; }
+  .allocation-donut { max-width: 220px; }
+  .allocation-card { padding: 18px; }
 }

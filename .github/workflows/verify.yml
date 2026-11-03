@@ -1,0 +1,46 @@
+name: Backend compile and frontend syntax
+
+on:
+  push:
+    branches:
+      - design/fintech-dashboard-v1-2026
+  pull_request:
+
+jobs:
+  backend-compile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/cryptoportfolio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/cryptoportfolio/pom.xml
+      - name: Run isolated transaction and precision tests
+        run: mvn -B '-Dtest=TransactionPrecisionTest,PortfolioQuantityPrecisionTest,CryptoCatalogTest,PortfolioSummaryTest,RealizedProfitCalculatorTest,JwtServiceTest' test
+
+  frontend-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          for file in frontend/js/*.js; do
+            node --check "$file"
+          done
+      - name: Test mobile navigation and responsive integration
+        run: node --test frontend/tests/*.test.mjs
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build deployable Java and frontend image
+        run: docker build -t crypto-portfolio:ci .

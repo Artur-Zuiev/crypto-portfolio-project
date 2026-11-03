@@ -3,7 +3,9 @@
 // Адрес backend-сервера для страницы transactions.html.
 // ==================================================
 
-const API_URL = "http://localhost:8080/api";
+const API_URL = window.location.port === "5500"
+    ? `${window.location.protocol}//${window.location.hostname}:8080/api`
+    : `${window.location.origin}/api`;
 
 
 // ==================================================
@@ -25,6 +27,38 @@ if (!token) {
 
 const allTransactionsList = document.getElementById("allTransactionsList");
 const logoutBtn = document.getElementById("logoutBtn");
+const searchInput = document.getElementById("transactionSearch");
+const typeFilter = document.getElementById("transactionTypeFilter");
+const countLabel = document.getElementById("transactionCount");
+const stats = document.getElementById("transactionStats");
+let transactionCache = [];
+function escapeHtml(value) {
+ return String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
+}
+function filteredTransactions() {
+ const q = (searchInput?.value || "").toLowerCase().trim();
+ const type = typeFilter?.value || "ALL";
+ return transactionCache.filter(t => (type === "ALL" || t.type === type) &&
+  (!q || [t.cryptoSymbol,t.cryptoName].some(s => String(s || "").toLowerCase().includes(q))));
+}
+function renderFilteredTransactions() {
+ const visible = filteredTransactions();
+ if (countLabel) countLabel.textContent = visible.length + " / " + transactionCache.length + " operations";
+ if (stats) {
+  const buys = visible.filter(t => t.type === "BUY").length;
+  const sells = visible.filter(t => t.type === "SELL").length;
+  stats.replaceChildren();
+  for (const [label,count] of [["Buy operations",buys],["Sell operations",sells],["Total operations",visible.length]]) {
+   const card = document.createElement("div"); card.className = "transaction-stat";
+   const caption = document.createElement("span"); caption.textContent = label;
+   const number = document.createElement("strong"); number.textContent = count;
+   card.append(caption,number); stats.appendChild(card);
+  }
+ }
+ renderAllTransactions(visible);
+}
+searchInput?.addEventListener("input",renderFilteredTransactions);
+typeFilter?.addEventListener("change",renderFilteredTransactions);
 
 
 // ==================================================
@@ -41,7 +75,7 @@ function formatEuro(value) {
 
 function formatNumber(value) {
     return Number(value || 0).toLocaleString("de-DE", {
-        maximumFractionDigits: 8
+        maximumFractionDigits: 16
     });
 }
 
@@ -87,12 +121,12 @@ function renderAllTransactions(transactions) {
         div.innerHTML = `
             <div class="transaction-left">
                 <div class="transaction-type ${typeClass}">
-                    ${transaction.type}
+                    ${escapeHtml(transaction.type)}
                 </div>
 
                 <div>
                     <div class="transaction-main">
-                        ${transaction.cryptoSymbol} · ${transaction.cryptoName}
+                        ${escapeHtml(transaction.cryptoSymbol)} · ${escapeHtml(transaction.cryptoName)}
                     </div>
                     <div class="transaction-date">
                         ${formatDateTime(transaction.transactionDate)}
@@ -101,13 +135,13 @@ function renderAllTransactions(transactions) {
             </div>
 
             <div class="transaction-right">
-                <div class="transaction-quantity">
-                    ${formatNumber(transaction.quantity)} ${transaction.cryptoSymbol}
+                <div class="transaction-quantity" data-label="Quantity">
+                    ${formatNumber(transaction.quantity)} ${escapeHtml(transaction.cryptoSymbol)}
                 </div>
-                <div class="transaction-price">
+                <div class="transaction-price" data-label="Price per coin">
                     ${formatEuro(transaction.price)} per coin
                 </div>
-                <div class="transaction-total">
+                <div class="transaction-total" data-label="Total">
                     ${formatEuro(transaction.totalValue)}
                 </div>
             </div>
@@ -145,7 +179,8 @@ async function loadAllTransactions() {
             return new Date(b.transactionDate) - new Date(a.transactionDate);
         });
 
-        renderAllTransactions(sortedTransactions);
+        transactionCache = sortedTransactions;
+        renderFilteredTransactions();
     } catch (error) {
         allTransactionsList.innerHTML = `<p class="empty-portfolio">Server error while loading transactions.</p>`;
         console.error(error);

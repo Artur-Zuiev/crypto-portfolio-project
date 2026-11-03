@@ -1,0 +1,27 @@
+/* Recorded trade P&L and browser-observed portfolio history. */
+.performance-note { display: block; color: #91a6c8; font-size: 12px; line-height: 1.5; margin-top: 8px; }
+.performance-history {
+ margin: 0 0 22px; padding: 25px; min-width: 0; background: var(--card);
+ border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+.performance-history-heading { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.performance-history h2 { font-size: 22px; margin: 3px 0; }
+.performance-eyebrow { margin: 0; font-size: 11px; letter-spacing: .1em; color: #7c9ff2; font-weight: 800; }
+.performance-samples { color: #a9bde1; font-size: 12px; border: 1px solid var(--border); border-radius: 99px; padding: 8px 12px; }
+.performance-chart {
+ margin-top: 18px; min-height: 220px; padding: 12px;
+ border-radius: 14px; border: 1px solid var(--border);
+ background: linear-gradient(170deg, rgba(37,63,106,.16), rgba(10,20,38,.4));
+ display: grid; place-items: center;
+}
+.performance-chart svg { display: block; width: 100%; height: auto; max-height: 280px; overflow: visible; }
+.performance-chart svg text { fill: #b2c5e6; font-family: inherit; font-size: 12px; }
+.performance-chart .chart-line { stroke: #6b8cff; stroke-width: 3; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.performance-chart .chart-grid { stroke: rgba(154,184,230,.15); stroke-width: 1; }
+.performance-chart .chart-point { fill: #9fd9ff; stroke: #162d56; stroke-width: 2; }
+.performance-chart .chart-area { fill: url(#value-history-fill); }
+.performance-chart-empty { max-width: 390px; color: #a9bde1; text-align: center; font-size: 14px; line-height: 1.6; }
+@media (max-width: 680px) {
+ .performance-history { padding: 18px; }
+ .performance-chart { min-height: 170px; padding: 8px; }
+}

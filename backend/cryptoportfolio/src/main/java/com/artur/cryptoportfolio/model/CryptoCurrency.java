@@ -23,11 +23,11 @@ public class CryptoCurrency {
     private String name;
 
     @NotNull(message = "Current price is required")
-    @DecimalMin(value = "0.01", message = "Current price must be greater than 0")
+    @DecimalMin(value = "0.0", message = "Current price must not be negative")
     private Double currentPrice;
 
     @NotNull(message = "Market cap is required")
-    @DecimalMin(value = "0.01", message = "Market cap must be greater than 0")
+    @DecimalMin(value = "0.0", message = "Market cap must not be negative")
     private Double marketCap;
 
     private LocalDateTime lastUpdated;

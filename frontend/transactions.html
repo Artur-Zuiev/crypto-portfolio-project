@@ -49,7 +49,13 @@
                 </a>
             </div>
 
-            <div class="transactions-list" id="allTransactionsList">
+            <div class="transactions-tools">
+<label>Search <input id="transactionSearch" type="search" placeholder="Search coin..." /></label>
+<label>Type <select id="transactionTypeFilter"><option value="ALL">All types</option><option value="BUY">Buy</option><option value="SELL">Sell</option></select></label>
+<span id="transactionCount" role="status"></span>
+</div>
+<div class="transaction-stats" id="transactionStats"></div>
+<div class="transactions-list" id="allTransactionsList">
                 <!-- All transactions will be rendered here by JavaScript -->
             </div>
         </section>

@@ -1,5 +1,7 @@
 package com.artur.cryptoportfolio.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -19,9 +21,11 @@ public class PortfolioItem {
     @JoinColumn(name = "crypto_currency_id")
     private CryptoCurrency cryptoCurrency;
 
-    private Double quantity;
+    @Column(precision = 38, scale = 18)
+    private BigDecimal quantity;
 
-    private Double averageBuyPrice;
+    @Column(precision = 38, scale = 18)
+    private BigDecimal averageBuyPrice;
 
     public PortfolioItem() {
 
@@ -47,19 +51,19 @@ public class PortfolioItem {
         this.cryptoCurrency = cryptoCurrency;
     }
 
-    public Double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
-    public Double getAverageBuyPrice() {
+    public BigDecimal getAverageBuyPrice() {
         return averageBuyPrice;
     }
 
-    public void setAverageBuyPrice(Double averageBuyPrice) {
+    public void setAverageBuyPrice(BigDecimal averageBuyPrice) {
         this.averageBuyPrice = averageBuyPrice;
     }
 }
