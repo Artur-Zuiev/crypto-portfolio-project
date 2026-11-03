@@ -134,6 +134,28 @@ You can inspect the checks under **Actions** or in [Pull Request #3](https://git
 - Charts and 3D assets render; camera reset and animation pause work.
 - On phone widths around 320–430px, buttons and labels remain readable, and there is no unexpected horizontal page scrolling.
 
+## Deploy on Railway (single HTTPS URL)
+
+This branch includes a root `Dockerfile` that builds the Java 21 backend and copies the frontend into the same runtime. The frontend requests the API from the same HTTPS origin in production; local Live Server on port 5500 continues to use the Java API on port 8080.
+
+1. Create a **new Railway project** and add a **PostgreSQL database**. Use a fresh, disposable/demo database: **do not import personal local credentials or the existing Windows database**.
+2. Add a service from GitHub repository `Artur-Zuiev/crypto-portfolio-project` using branch `design/fintech-dashboard-v1-2026`. The service should detect the `Dockerfile` in the repository root.
+3. Configure the following backend service variables. Use Railway reference variables for the actual Postgres service rather than hardcoded credentials:
+
+   | Variable | Value |
+   | --- | --- |
+   | `DB_URL` | `jdbc:postgresql://<postgres-host>:<postgres-port>/<database>` from Railway Postgres |
+   | `DB_USERNAME` | Railway Postgres username |
+   | `DB_PASSWORD` | Railway Postgres password (secret) |
+   | `JWT_SECRET` | A fresh random secret, at least 32 UTF-8 bytes |
+   | `SPRING_JPA_HIBERNATE_DDL_AUTO` | `update` **only for the first start against an empty demo database** |
+
+   The Postgres host/port and credentials are provider-assigned values, not values copied from a local Windows installation. Once the schema exists, **remove** `SPRING_JPA_HIBERNATE_DDL_AUTO` so normal `validate` applies on subsequent starts. Never apply automatic schema creation/update to an existing production database without reviewed migrations.
+4. Generate a public HTTPS domain for the app service on Railway. Check `/login.html` and `/api/test` under **the same hostname**, then register a fresh demo account.
+5. Test BUY, SELL, transaction history, P/L and 3D UI before sharing the link. Keep ports private and do not publish any secrets.
+
+This project is an educational demonstration. Before allowing untrusted users, add production protections such as registration abuse controls, rate limits, secret rotation, backup/restore, monitored database migrations and security review.
+
 ## Project status
 
 **Feature development / local acceptance testing.** The enhanced dashboard and responsive UI currently live on branch `design/fintech-dashboard-v1-2026` in [PR #3](https://github.com/Artur-Zuiev/crypto-portfolio-project/pull/3). A production deployment and public demo are future steps, not completed features.
