@@ -1,143 +1,145 @@
 # Crypto Portfolio
 
-A full-stack portfolio project for tracking cryptocurrency holdings and transactions, built with **Java 21**, **Spring Boot**, **PostgreSQL**, and a browser-based **HTML/CSS/JavaScript** frontend.
+**A responsive full-stack cryptocurrency portfolio tracker** built with Java 21, Spring Boot, PostgreSQL, vanilla JavaScript, and Three.js.
 
-> **Portfolio project:** This repository showcases application development, backend APIs, authentication, data persistence, and a custom user interface. It is not financial advice or a production trading service.
+Track fictional portfolio trades, monitor holdings and profit/loss, and explore assets in an interactive 3D view.
 
-## What the project includes
+[Features](#features) · [Technology](#technology) · [Getting started](#getting-started) · [Mobile preview](#mobile-preview) · [Architecture](#architecture) · [Testing](#testing)
 
-- Registration and login pages
-- Portfolio dashboard with holdings and summary cards
-- Buy/sell transaction entry and transaction history
-- Portfolio filtering, sorting, editing, and deletion controls
-- Portfolio allocation visualization
-- A separate 3D interface built with Three.js
+> **Demo portfolio / learning project.** This application records simulated portfolio transactions; it does not execute cryptocurrency trades or provide investment advice. A publicly hosted demo is not available yet.
 
-The frontend and backend are kept in separate directories.
+## Features
 
-## Technology stack
-
-| Layer | Technologies |
+| Area | What it demonstrates |
 | --- | --- |
-| Backend | Java 21, Spring Boot 4, Spring Security, Spring Data JPA, Bean Validation |
-| Data | PostgreSQL |
-| Authentication | Spring Security and JJWT |
-| Frontend | HTML, modular CSS, JavaScript |
-| Visualization | Three.js |
-| Build | Maven Wrapper |
+| Accounts | Registration, login, and JWT-secured user-specific portfolio data |
+| Portfolio | Holding quantities, average purchase costs, current valuations, sorting, and filtering |
+| Trading history | Simulated BUY and SELL records, including partial sales and fractional quantities |
+| Financial metrics | Unrealized P/L, realized P/L from recorded sales, combined P/L, and per-asset performance |
+| Visualization | Portfolio allocation donut, observed portfolio value history, and interactive Three.js scene |
+| Responsive UI | Desktop, tablet and phone layouts, touch-sized controls and mobile asset cards |
 
-## Repository structure
+**Financial precision:** Values are computed on the backend using `BigDecimal` for transaction quantities and prices. Ordinary EUR figures are displayed to two decimal places. Very small non-zero gains or losses can show additional digits so they are not mistaken for zero.
 
-```text
-.
-├── backend/
-│   └── cryptoportfolio/
-│       ├── pom.xml
-│       ├── mvnw
-│       └── src/
-└── frontend/
-    ├── dashboard.html
-    ├── login.html
-    ├── register.html
-    ├── transactions.html
-    ├── scene.html
-    ├── css/
-    └── js/
-```
+**Realized P/L:** Recorded BUY/SELL transactions are replayed chronologically using a weighted-average cost basis. If a sale cannot be matched to recorded purchases, the application reports incomplete transaction history rather than inventing a result. Trading fees and taxes are not included.
 
-Additional frontend implementation notes:
-- [Frontend architecture](frontend/PROJECT_STRUCTURE_README.md)
-- [CSS organization](frontend/CSS_STRUCTURE_README.md)
+**Value history:** The graph records actual portfolio valuations observed in the current browser over time. It is *not* a historical market-price reconstruction, and observations do not synchronize across devices.
+
+## Technology
+
+| Layer | Stack |
+| --- | --- |
+| Backend | Java 21, Spring Boot 4.0.6, Spring Web MVC, Spring Security, Spring Data JPA |
+| Data | PostgreSQL, JPA, `BigDecimal` |
+| Authentication | JWT (JJWT), BCrypt |
+| Frontend | HTML5, modular CSS, vanilla JavaScript |
+| 3D visualization | Three.js |
+| Testing / CI | JUnit 5, Maven, Node.js smoke tests, GitHub Actions |
 
 ## Getting started
 
-### Requirements
+### Prerequisites
 
-- JDK 21
-- PostgreSQL
-- A modern browser
-- Maven is optional because the backend contains the Maven Wrapper
+- Java Development Kit 21
+- PostgreSQL running locally
+- Maven Wrapper included in the backend
+- A local static file server (for example, VS Code Live Server or Python)
 
-### Backend
+### 1. Set up the database and backend
 
-1. Clone the repository.
-2. Create a local PostgreSQL database.
-3. Review the backend configuration under `backend/cryptoportfolio/src/main/resources/` and provide the required database and authentication settings **locally**. Do not commit passwords, private keys, or tokens.
-4. From `backend/cryptoportfolio`, run:
+Create a PostgreSQL database named `crypto_portfolio`. **Do not run any initialization or bootstrap profile against a database containing data you want to keep.** The normal application uses schema validation, so a fresh database needs its schema created first according to the backend's existing setup/bootstrap process.
 
-```bash
-./mvnw spring-boot:run
-```
+Set these environment variables in IntelliJ IDEA or your local terminal:
 
-On Windows use `mvnw.cmd spring-boot:run`.
+| Variable | Example / purpose |
+| --- | --- |
+| `DB_URL` | `jdbc:postgresql://localhost:5432/crypto_portfolio` |
+| `DB_USERNAME` | Your local PostgreSQL user, e.g. `postgres` |
+| `DB_PASSWORD` | Your local PostgreSQL password |
+| `JWT_SECRET` | A securely generated secret of at least 32 UTF-8 bytes |
 
-### Frontend
+Never commit passwords, JWT signing keys, or access tokens.
 
-The frontend is located in `frontend/`. It contains standalone HTML pages and JavaScript that communicate with the backend.
-
-For local development, serve the `frontend` folder using a local HTTP server (for example, `python3 -m http.server 5500` from that directory), then open `http://localhost:5500/login.html`.
-
-Check the frontend API base URL and the backend CORS settings for your local environment. The exact database configuration and end-to-end setup may need adjustment; a fully working deployment is **not** claimed here.
-
-## Portfolio analytics (dashboard update)
-
-The dashboard distinguishes:
-- **Unrealized P/L:** change in the market value of current positions versus their weighted-average purchase cost.
-- **Realized P/L:** gain or loss from recorded sales. The authenticated endpoint `GET /api/portfolio/performance/realized` replays BUY/SELL history chronologically with a weighted-average cost basis using `BigDecimal`.
-- **Combined P/L:** realized plus unrealized amounts, displayed only when the recorded sale history can be matched to buys.
-- **Value history:** genuine observations of portfolio value taken while the dashboard is opened/refreshed and stored **locally in that browser**, per logged-in account (up to 90 days/360 samples). This is not a reconstructed historical-price chart and does not sync between devices.
-
-Realized P/L does not include trading fees or taxes. Direct editing/deleting of holdings bypasses the trade ledger and can make historic cost reconciliation incomplete. Unmatched sales are explicitly reported instead of inventing a profit. The system is a demonstration portfolio tracker, not accounting software.
-
-Tiny nonzero gains/losses retain additional decimals, while normal euro values use two decimal places. The 3D view provides reset-camera and pause-motion controls (and respects the operating system's reduced-motion preference).
-
-### Final local verification
-
-1. Keep the existing `crypto_portfolio` PostgreSQL database; no new tables are required for these analytics. Start Java 21 backend with the existing local `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET` variables, with no `bootstrap` profile.
-2. Serve the updated `frontend/` files (e.g. Live Server on port 5500) and log in.
-3. Confirm that Realized/Unrealized/Combined P&L cards load. The existing recorded BTC partial sale should appear in Realized P/L.
-4. Refresh the dashboard at different times to create genuine history observations. The chart will initially say it needs another observation.
-5. Test 3D Reset view, Pause motion, asset selection, and Reload 3D.
-6. Verify that holdings, BUY/SELL history and fractional amounts have not changed. Only then consider merging the feature branch.
-
-## Use on a phone (same Wi-Fi as your Windows PC)
-
-The frontend adapts to narrow screens (320px and wider), including the portfolio cards, BUY/SELL flow, full transaction history, sign-in forms, trend chart, and touch-friendly 3D visualization. This is a **mobile browser version**, not an installable Android/iOS application.
-
-Both devices must be connected to a trusted local Wi-Fi network. Start the Spring Boot backend on your PC with Java 21 and your existing database/JWT environment variables, plus:
-
-```text
-MOBILE_FRONTEND_ORIGIN=http://192.168.1.50:5500
-```
-
-Replace `192.168.1.50` with your Windows PC's current LAN IPv4 address (find it with `ipconfig`). The origin must exactly match the address you will type on the phone; this setting deliberately does **not** allow arbitrary websites to access authenticated endpoints.
-
-Run the frontend from the `frontend` folder on your PC, for example:
+From `backend/cryptoportfolio`, run:
 
 ```powershell
-py -m http.server 5500 --bind 0.0.0.0
+.\mvnw.cmd spring-boot:run
 ```
 
-Then open `http://192.168.1.50:5500/login.html` on your phone. The frontend automatically contacts the **same host** on port 8080 for the Java API. A server bound to localhost only will not be reachable from the phone.
+The backend normally listens on port `8080`. On an existing configured database, keep the `Active profiles` field empty in IntelliJ IDEA.
 
-If Windows asks about network access, allow Python and Java only on the trusted **Private** network (not Public). Never forward ports 5500 or 8080 through your internet router, and do not use this unencrypted HTTP development setup on public Wi-Fi. Login again on the phone because its browser has its own token storage. Stop the servers after testing. The observed history chart is local to each browser and does not sync across devices.
+### 2. Start the frontend
 
-## Code organization
+Serve the `frontend` directory over HTTP, for example:
 
-The frontend styles are separated into reusable foundational rules and page-specific blocks. JavaScript files are organized by UI responsibility. The backend follows Spring Boot's application structure.
+```powershell
+cd frontend
+py -m http.server 5500
+```
 
-## What this demonstrates
+Open **http://localhost:5500/login.html** and create an account. The frontend calls the backend on the same hostname, port `8080`.
 
-- Designing and organizing a full-stack application
-- Building backend features with Spring and persistence with JPA
-- Handling authenticated user workflows
-- Presenting financial-style data in a responsive interface
-- Creating an additional interactive 3D view
+## Mobile preview
+
+The website is responsive, including authentication screens, the dashboard, transactions, holding cards, and the 3D scene. This is a mobile **web interface**, not a native app.
+
+To test from a phone on a **trusted private Wi-Fi**:
+
+1. Find your Windows PC's local IPv4 address with `ipconfig` (example: `192.168.1.50`).
+2. Add `MOBILE_FRONTEND_ORIGIN=http://192.168.1.50:5500` to the backend's environment, using **your actual IP**, then restart the backend.
+3. Make sure the backend is reachable from other devices on the private LAN. Run the frontend from `frontend/` with `py -m http.server 5500 --bind 0.0.0.0`.
+4. Open `http://192.168.1.50:5500/login.html` in your phone's browser. Allow Java and the frontend server in Windows Firewall for the **Private** network only if needed.
+
+Do not expose the local development ports through a router, use this HTTP testing setup on a public network, or deploy it on the internet as-is. The phone uses its own browser session and observed-value history.
+
+## Architecture
+
+```text
+frontend/
+  dashboard.html        Dashboard, forms, metrics and holdings
+  transactions.html     Filterable transaction history
+  scene.html            Interactive 3D portfolio
+  login.html            Login
+  register.html         Registration
+  css/                  Shared and page-specific responsive styles
+  js/                   Frontend behavior and API requests
+  tests/                Frontend smoke / formatting tests
+
+backend/cryptoportfolio/
+  src/main/java/.../
+    controller/          REST endpoints
+    service/             Portfolio, pricing and accounting rules
+    model/               JPA entities
+    repository/          Database access
+    config/              Authentication and security configuration
+  src/test/              Backend regression tests
+```
+
+The client sends JSON requests to the Spring Boot API. Protected portfolio endpoints require an authenticated session. PostgreSQL stores accounts, holdings and transactions. The 3D visualization and browser-local value observations use portfolio data from the API.
+
+For implementation details see [Frontend architecture](frontend/PROJECT_STRUCTURE_README.md) and [CSS organization](frontend/CSS_STRUCTURE_README.md).
+
+## Testing
+
+This feature branch uses GitHub Actions to run selected backend tests and frontend JavaScript syntax / Node smoke tests. It includes regression checks for transaction precision, partial sales, financial summaries, crypto catalog initialization, JWT operations, responsive navigation, and euro formatting.
+
+You can inspect the checks under **Actions** or in [Pull Request #3](https://github.com/Artur-Zuiev/crypto-portfolio-project/pull/3).
+
+### Manual acceptance checklist
+
+- Login and registration succeed; authenticated requests are scoped to the correct account.
+- BUY and SELL work with fractional quantities and the correct remaining holdings.
+- Realized, unrealized and combined P/L are consistent with the transaction history.
+- Search, sorting, filters and transaction history work.
+- Charts and 3D assets render; camera reset and animation pause work.
+- On phone widths around 320–430px, buttons and labels remain readable, and there is no unexpected horizontal page scrolling.
 
 ## Project status
 
-An evolving personal learning and portfolio project. Before using this code in a real financial or public-facing context, review security, configuration, tests, and deployment readiness.
+**Feature development / local acceptance testing.** The enhanced dashboard and responsive UI currently live on branch `design/fintech-dashboard-v1-2026` in [PR #3](https://github.com/Artur-Zuiev/crypto-portfolio-project/pull/3). A production deployment and public demo are future steps, not completed features.
+
+To turn this into a public demo, the next work should include a deployment-ready configuration, HTTPS, hosted PostgreSQL, environment-based secrets, rate limiting, stable market-data error handling, and a demo account or isolated seeded data. Screenshots should be added after validating the final UI on desktop and mobile.
 
 ---
 
-**Developer:** [Artur Zuiev](https://github.com/Artur-Zuiev) · Austria
+Built by **[Artur Zuiev](https://github.com/Artur-Zuiev)** · Austria
