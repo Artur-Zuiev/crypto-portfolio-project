@@ -23,6 +23,26 @@ test("mobile dashboard uses labeled asset cards and all navigation routes", () =
   }
 });
 
+test("phone layout includes flexible KPI cards, responsive fields and touch targets", () => {
+  const css = get("../css/blocks/99-responsive.css");
+  assert.match(css, /@media \(max-width: 760px\)/);
+  assert.match(css, /\.summary-card:first-child\s*\{\s*grid-column: 1 \/ -1/);
+  assert.match(css, /\.summary-card:nth-child\(5\), \.summary-card:nth-child\(6\)/);
+  assert.match(css, /\.portfolio-item \.action-buttons button\s*\{\s*min-height: 44px/);
+  assert.match(css, /\.transaction-right > div::before/);
+  assert.match(css, /\.delete-modal-box\s*\{/);
+  assert.doesNotMatch(css, /LAPTOP \/ SMALL SCREEN FIX/);
+});
+
+test("transaction rows provide readable mobile labels on both pages", () => {
+  for (const name of ["dashboard", "transactions"]) {
+    const js = get("../js/" + name + ".js");
+    for (const label of ["Quantity", "Price per coin", "Total"]) {
+      assert.ok(js.includes('data-label="' + label + '"'));
+    }
+  }
+});
+
 test("all frontend API callers use actual page host for Wi-Fi access", () => {
   for (const name of ["auth", "dashboard", "transactions", "scene"]) {
     const source = get("../js/" + name + ".js");
