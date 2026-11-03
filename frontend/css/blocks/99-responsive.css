@@ -226,11 +226,41 @@
     .edit-actions button { min-height: 44px !important; }
 
     .transaction-item { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
-    .transaction-right { width: 100%; min-width: 0; grid-template-columns: 1fr !important; text-align: left !important; }
+    .transaction-right {
+        width: 100%; min-width: 0;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important; text-align: left !important;
+    }
+    .transaction-right > div {
+        min-width: 0; display: flex; flex-direction: column;
+        justify-content: center; gap: 4px;
+        overflow-wrap: anywhere;
+        padding: 9px 11px; border-radius: 10px;
+        background: rgba(94, 127, 190, .09);
+    }
+    .transaction-right > div::before {
+        content: attr(data-label); font-size: 10px;
+        letter-spacing: .04em; text-transform: uppercase;
+        color: #9aacc9; font-weight: 700;
+    }
+    .transaction-right > .transaction-total {
+        grid-column: 1 / -1;
+        color: #fff; font-size: 16px;
+    }
     .transaction-stats { grid-template-columns: 1fr !important; gap: 8px !important; }
     .transactions-tools { gap: 10px !important; }
     .transactions-tools label { min-width: 0; flex: 1 1 100% !important; }
     .transactions-view-btn { min-height: 44px; }
+    .transaction-left { min-width: 0; }
+    .transaction-main { overflow-wrap: anywhere; }
+    .transaction-item { padding: 13px !important; }
+    .transactions-title { font-size: clamp(20px, 6vw, 26px); }
+    .transactions-header { gap: 10px; }
+    .transaction-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .transaction-stat:last-child { grid-column: 1 / -1; }
+    .transaction-stat { padding: 13px !important; min-width: 0; }
+    .transaction-stat strong { font-size: 21px; }
 
     .allocation-chart { display: grid !important; grid-template-columns: 1fr !important; }
     .allocation-donut { width: min(230px, 70vw) !important; margin: 0 auto; }
