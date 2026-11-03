@@ -166,16 +166,37 @@ function apiSend(path, method, body = null) {
 // Деньги, числа, даты и проверка свежести цены.
 // ==================================================
 
+// Monetary values are always shown in euro cents. Financial computations
+// retain their original backend precision; this is only presentation.
 function formatEuro(value) {
     const amount = Number(value ?? 0);
     if (!Number.isFinite(amount)) return "—";
-    const magnitude = Math.abs(amount);
-    // Preserve visible sub-cent movement instead of turning small P/L into 0,00 €.
-    const digits = magnitude > 0 && magnitude < 0.005 ? 18 : 2;
     return `${amount.toLocaleString("de-DE", {
-        minimumFractionDigits: digits === 2 ? 2 : 0,
-        maximumFractionDigits: digits
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
     })} €`;
+}
+
+// For gains/losses smaller than one cent, extra digits prevent a real
+// gain or loss from appearing as zero. Limit decimals to avoid UI overflow.
+function formatProfitEuro(value) {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
+    if (amount === 0 || Math.abs(amount) >= 0.005) return formatEuro(amount);
+    if (Math.abs(amount) < 0.000001) {
+        return amount < 0 ? "−<0,000001 €" : "<0,000001 €";
+    }
+    return `${amount.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+    })} €`;
+}
+
+function fullPrecisionEuro(value) {
+    const amount = Number(value ?? 0);
+    return Number.isFinite(amount)
+        ? `${amount.toLocaleString("de-DE", { maximumFractionDigits: 18 })} €`
+        : "—";
 }
 
 function formatNumber(value) {
@@ -543,7 +564,8 @@ function setProfitText(element, value) {
         return;
     }
 
-    element.textContent = formatEuro(value);
+    element.textContent = formatProfitEuro(value);
+    element.title = `Exact result: ${fullPrecisionEuro(value)}`;
     element.className = Number(value || 0) >= 0 ? "profit" : "loss";
 }
 
@@ -557,7 +579,8 @@ function setCoinResult(element, symbol, profitLoss, noResultText = "No change ye
         return;
     }
 
-    element.textContent = `${symbol} ${formatEuro(result)}`;
+    element.textContent = `${symbol} ${formatProfitEuro(result)}`;
+    element.title = `Exact result: ${fullPrecisionEuro(result)}`;
     element.className = result > 0 ? "profit" : "loss";
 }
 
@@ -972,7 +995,7 @@ function renderPortfolioList() {
             <span data-label="Buy price">${formatEuro(item.averageBuyPrice)}</span>
             <span data-label="Current price">${formatEuro(item.currentPrice)}</span>
             <span data-label="Value">${formatEuro(item.currentValue)}</span>
-            <span data-label="Profit / Loss" class="${item.profitLoss >= 0 ? "profit" : "loss"}">${formatEuro(item.profitLoss)}</span>
+            <span data-label="Profit / Loss" class="${item.profitLoss >= 0 ? "profit" : "loss"}">${formatProfitEuro(item.profitLoss)}</span>
             <span data-label="Allocation" class="allocation-badge">${formatPercent(item.allocationPercentage)}%</span>
             <div class="action-buttons" aria-label="Asset actions">
                 <button class="edit-btn" data-action="edit" data-id="${item.id}">Edit</button>
