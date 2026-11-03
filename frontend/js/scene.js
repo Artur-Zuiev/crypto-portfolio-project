@@ -16,6 +16,8 @@ const sceneTotalValue = document.getElementById("sceneTotalValue");
 const sceneStatus = document.getElementById("sceneStatus");
 const sceneAssetsList = document.getElementById("sceneAssetsList");
 const reloadSceneBtn = document.getElementById("reloadSceneBtn");
+const resetViewBtn = document.getElementById("resetViewBtn");
+const pauseMotionBtn = document.getElementById("pauseMotionBtn");
 
 const coinModal = document.getElementById("coinModal");
 const closeCoinModal = document.getElementById("closeCoinModal");
@@ -52,6 +54,7 @@ let modalOpenTimer = null;
 let pointerDownPosition = new THREE.Vector2();
 let pointerMovedDistance = 0;
 let isDraggingScene = false;
+let motionPaused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const API_URL = "http://localhost:8080";
 
@@ -74,6 +77,26 @@ loadPortfolioAndBuildScene();
 reloadSceneBtn.addEventListener("click", () => {
     loadPortfolioAndBuildScene();
 });
+
+function updateMotionButton() {
+    if (!pauseMotionBtn) return;
+    pauseMotionBtn.textContent = motionPaused ? "Resume motion" : "Pause motion";
+    pauseMotionBtn.setAttribute("aria-pressed", String(motionPaused));
+}
+updateMotionButton();
+pauseMotionBtn?.addEventListener("click", () => {
+    motionPaused = !motionPaused;
+    updateMotionButton();
+});
+resetViewBtn?.addEventListener("click", () => {
+    cameraTargetPosition = defaultCameraPosition.clone();
+    cameraLookAtTarget.copy(defaultControlsTarget);
+    coinModal?.classList.add("hidden");
+});
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") coinModal?.classList.add("hidden");
+});
+
 
 sceneAssetsList.addEventListener("click", (event) => {
     const assetRow = event.target.closest(".asset-row");
@@ -1395,16 +1418,18 @@ function animate() {
 
     const time = performance.now() * 0.001;
 
-    if (particles) {
+    if (particles && !motionPaused) {
         particles.rotation.y += 0.0009;
         particles.rotation.x += 0.00025;
     }
 
     cryptoObjects.forEach((object) => {
-        object.rotation.y += object.userData.rotationSpeed || 0.004;
-        object.rotation.x += 0.0012;
+        if (!motionPaused) {
+            object.rotation.y += object.userData.rotationSpeed || 0.004;
+            object.rotation.x += 0.0012;
+        }
 
-        if (typeof object.userData.baseY === "number") {
+        if (typeof object.userData.baseY === "number" && !motionPaused) {
             object.position.y =
                 object.userData.baseY +
                 Math.sin(time * 1.2 + object.userData.floatOffset) * 0.12;
