@@ -1029,7 +1029,7 @@ function openCoinModal(data) {
     modalCoinQuantity.textContent = formatNumber(data.quantity);
     modalCoinPrice.textContent = formatCurrency(data.currentPrice);
     modalCoinValue.textContent = formatCurrency(data.value);
-    modalCoinProfit.textContent = formatCurrency(data.profitLoss);
+    modalCoinProfit.textContent = formatProfitCurrency(data.profitLoss);
 
     if (modalCoinProfitPercent) {
         modalCoinProfitPercent.textContent = formatPercent(data.profitPercent);
@@ -1251,16 +1251,30 @@ function getObjectDisplayColor(symbol, profitStatus) {
     return getColorBySymbol(symbol);
 }
 
+// All valuations and market prices use standard euro cents.
 function formatCurrency(value) {
-    const numeric = Number(value ?? 0);
-    if (!Number.isFinite(numeric)) return "—";
-    const fractionDigits = Math.abs(numeric) > 0 && Math.abs(numeric) < 0.005 ? 18 : 2;
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
     return new Intl.NumberFormat("de-DE", {
         style: "currency",
         currency: "EUR",
-        minimumFractionDigits: fractionDigits === 2 ? 2 : 0,
-        maximumFractionDigits: fractionDigits
-    }).format(numeric);
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount);
+}
+
+// Only sub-cent profit/loss warrants extra display precision.
+function formatProfitCurrency(value) {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
+    if (amount === 0 || Math.abs(amount) >= 0.005) return formatCurrency(amount);
+    if (Math.abs(amount) < 0.000001) {
+        return amount < 0 ? "−<0,000001 €" : "<0,000001 €";
+    }
+    return `${amount.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+    })} €`;
 }
 
 function setStatus(text, type) {
