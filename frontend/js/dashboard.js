@@ -167,7 +167,9 @@ function apiSend(path, method, body = null) {
 // ==================================================
 
 function formatEuro(value) {
-    return `${Number(value || 0).toLocaleString("de-DE", {
+    const numeric = Number(value || 0);
+    const normalized = Math.abs(numeric) < 0.005 ? 0 : numeric;
+    return `${normalized.toLocaleString("de-DE", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     })} €`;
@@ -301,19 +303,40 @@ function renderLastUpdated() {
 }
 
 function updateCryptoSelectPrices() {
-    if (!dom.cryptoSelect) {
-        return;
-    }
+    if (!dom.cryptoSelect) return;
+
+    // Coin identifiers must come from the database, not hard-coded option IDs.
+    // This also works after users reset PostgreSQL and the IDs change.
+    const previousSymbol = getSelectedCryptoSymbol();
+    const placeholder = new Option("Choose crypto", "");
+    dom.cryptoSelect.replaceChildren(placeholder);
 
     for (const crypto of state.cryptoList) {
-        const option = [...dom.cryptoSelect.options].find((item) => item.dataset.symbol === crypto.symbol);
-
-        if (option) {
-            option.dataset.price = crypto.currentPrice;
-        }
+        const option = new Option(`${crypto.symbol} - ${crypto.name}`, String(crypto.id));
+        option.dataset.symbol = crypto.symbol;
+        option.dataset.name = crypto.name;
+        option.dataset.price = String(crypto.currentPrice ?? 0);
+        dom.cryptoSelect.add(option);
     }
 
+    const matching = [...dom.cryptoSelect.options].find(option => option.dataset.symbol === previousSymbol);
+    if (matching) dom.cryptoSelect.value = matching.value;
+
+    // Existing custom dropdown buttons remain, but use database IDs.
+    dom.cryptoDropdownOptions.forEach(button => {
+        const symbol = button.querySelector(".crypto-option-icon")?.textContent?.trim();
+        const coin = state.cryptoList.find(item => item.symbol === symbol);
+        button.dataset.value = coin ? String(coin.id) : "";
+        button.disabled = !coin;
+    });
+
+    updateCustomCryptoDropdown();
     updateSelectedCryptoPriceInfo();
+    const price = getSelectedCryptoPrice();
+    if (price > 0 && dom.priceInput && !dom.priceInput.value) {
+        dom.priceInput.value = price;
+        updateTransactionPreview();
+    }
 }
 
 async function autoRefreshPricesIfNeeded() {
@@ -334,14 +357,14 @@ async function refreshPrices({ silent = false } = {}) {
         setButtonLoading(dom.refreshPricesBtn, true, "Updating...", "Refresh Prices");
         await apiSend("/crypto/update-prices", "POST");
 
+        await reloadDashboardData({ includeCrypto: true, includeTransactions: true });
+
         if (!silent) {
             showMessage("Prices updated successfully", "success");
         }
-
-        await reloadDashboardData({ includeCrypto: true, includeTransactions: true });
     } catch (error) {
         if (!silent) {
-            showMessage("Could not refresh prices", "error");
+            showMessage(error.message || "Could not refresh prices", "error");
         }
         console.error(error);
     } finally {
@@ -390,8 +413,17 @@ function setCoinResult(element, symbol, profitLoss) {
         return;
     }
 
-    element.textContent = `${symbol || "-"} ${formatEuro(profitLoss)}`;
-    element.className = Number(profitLoss || 0) >= 0 ? "profit" : "loss";
+    // An empty portfolio has neither a best nor a worst coin.
+    if (!symbol || symbol === "-") {
+        element.textContent = "No assets yet";
+        element.className = "";
+        return;
+    }
+
+    const result = Number(profitLoss || 0);
+    // Zero is neutral; never display a misleading minus sign.
+    element.textContent = `${symbol} ${formatEuro(result === 0 ? 0 : result)}`;
+    element.className = result > 0 ? "profit" : result < 0 ? "loss" : "";
 }
 
 
@@ -1044,8 +1076,8 @@ function handleCryptoSelectChange() {
 
     const currentPrice = getSelectedCryptoPrice();
 
-    if (currentPrice > 0 && dom.priceInput) {
-        dom.priceInput.value = currentPrice;
+    if (dom.priceInput) {
+        dom.priceInput.value = currentPrice > 0 ? currentPrice : "";
     }
 
     updateTransactionPreview();
