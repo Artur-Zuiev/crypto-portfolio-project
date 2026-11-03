@@ -139,16 +139,14 @@ public class PortfolioService {
         BigDecimal totalValue = BigDecimal.ZERO;
         BigDecimal totalInvested = BigDecimal.ZERO;
 
+        // Best Coin is a genuine positive return, Worst Coin a genuine loss.
+        // Break-even holdings must not appear as both the best and worst asset.
         String bestAssetSymbol = "-";
         BigDecimal bestAssetProfitLoss = BigDecimal.ZERO;
-
         String worstAssetSymbol = "-";
         BigDecimal worstAssetProfitLoss = BigDecimal.ZERO;
 
-        boolean firstItem = true;
-
         for (PortfolioItem item : items) {
-
             BigDecimal quantity = item.getQuantity();
             BigDecimal averageBuyPrice = item.getAverageBuyPrice();
             BigDecimal currentPrice = BigDecimal.valueOf(item.getCryptoCurrency().getCurrentPrice());
@@ -160,24 +158,14 @@ public class PortfolioService {
             totalValue = totalValue.add(currentValue);
             totalInvested = totalInvested.add(investedValue);
 
-            if (firstItem) {
+            if (profitLoss.compareTo(bestAssetProfitLoss) > 0) {
                 bestAssetSymbol = item.getCryptoCurrency().getSymbol();
                 bestAssetProfitLoss = profitLoss;
+            }
 
+            if (profitLoss.compareTo(worstAssetProfitLoss) < 0) {
                 worstAssetSymbol = item.getCryptoCurrency().getSymbol();
                 worstAssetProfitLoss = profitLoss;
-
-                firstItem = false;
-            } else {
-                if (profitLoss.compareTo(bestAssetProfitLoss) > 0) {
-                    bestAssetSymbol = item.getCryptoCurrency().getSymbol();
-                    bestAssetProfitLoss = profitLoss;
-                }
-
-                if (profitLoss.compareTo(worstAssetProfitLoss) < 0) {
-                    worstAssetSymbol = item.getCryptoCurrency().getSymbol();
-                    worstAssetProfitLoss = profitLoss;
-                }
             }
         }
 
