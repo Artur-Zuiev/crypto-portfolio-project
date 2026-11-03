@@ -100,6 +100,28 @@ Tiny nonzero gains/losses retain additional decimals, while normal euro values u
 5. Test 3D Reset view, Pause motion, asset selection, and Reload 3D.
 6. Verify that holdings, BUY/SELL history and fractional amounts have not changed. Only then consider merging the feature branch.
 
+## Use on a phone (same Wi-Fi as your Windows PC)
+
+The frontend adapts to narrow screens (320px and wider), including the portfolio cards, BUY/SELL flow, full transaction history, sign-in forms, trend chart, and touch-friendly 3D visualization. This is a **mobile browser version**, not an installable Android/iOS application.
+
+Both devices must be connected to a trusted local Wi-Fi network. Start the Spring Boot backend on your PC with Java 21 and your existing database/JWT environment variables, plus:
+
+```text
+MOBILE_FRONTEND_ORIGIN=http://192.168.1.50:5500
+```
+
+Replace `192.168.1.50` with your Windows PC's current LAN IPv4 address (find it with `ipconfig`). The origin must exactly match the address you will type on the phone; this setting deliberately does **not** allow arbitrary websites to access authenticated endpoints.
+
+Run the frontend from the `frontend` folder on your PC, for example:
+
+```powershell
+py -m http.server 5500 --bind 0.0.0.0
+```
+
+Then open `http://192.168.1.50:5500/login.html` on your phone. The frontend automatically contacts the **same host** on port 8080 for the Java API. A server bound to localhost only will not be reachable from the phone.
+
+If Windows asks about network access, allow Python and Java only on the trusted **Private** network (not Public). Never forward ports 5500 or 8080 through your internet router, and do not use this unencrypted HTTP development setup on public Wi-Fi. Login again on the phone because its browser has its own token storage. Stop the servers after testing. The observed history chart is local to each browser and does not sync across devices.
+
 ## Code organization
 
 The frontend styles are separated into reusable foundational rules and page-specific blocks. JavaScript files are organized by UI responsibility. The backend follows Spring Boot's application structure.
