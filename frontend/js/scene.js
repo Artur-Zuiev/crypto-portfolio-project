@@ -1252,10 +1252,15 @@ function getObjectDisplayColor(symbol, profitStatus) {
 }
 
 function formatCurrency(value) {
+    const numeric = Number(value ?? 0);
+    if (!Number.isFinite(numeric)) return "—";
+    const fractionDigits = Math.abs(numeric) > 0 && Math.abs(numeric) < 0.005 ? 18 : 2;
     return new Intl.NumberFormat("de-DE", {
         style: "currency",
-        currency: "EUR"
-    }).format(value || 0);
+        currency: "EUR",
+        minimumFractionDigits: fractionDigits === 2 ? 2 : 0,
+        maximumFractionDigits: fractionDigits
+    }).format(numeric);
 }
 
 function setStatus(text, type) {
