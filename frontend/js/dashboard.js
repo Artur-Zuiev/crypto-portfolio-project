@@ -966,15 +966,15 @@ function renderPortfolioList() {
 
     dom.portfolioList.innerHTML = visiblePortfolio.map((item) => `
         <div class="portfolio-item">
-            <span class="coin-symbol">${escapeHtml(item.symbol)}</span>
-            <span>${escapeHtml(item.name)}</span>
-            <span>${formatNumber(item.quantity)}</span>
-            <span>${formatEuro(item.averageBuyPrice)}</span>
-            <span>${formatEuro(item.currentPrice)}</span>
-            <span>${formatEuro(item.currentValue)}</span>
-            <span class="${item.profitLoss >= 0 ? "profit" : "loss"}">${formatEuro(item.profitLoss)}</span>
-            <span class="allocation-badge">${formatPercent(item.allocationPercentage)}%</span>
-            <div class="action-buttons">
+            <span class="coin-symbol" data-label="Symbol">${escapeHtml(item.symbol)}</span>
+            <span data-label="Name">${escapeHtml(item.name)}</span>
+            <span data-label="Quantity">${formatNumber(item.quantity)}</span>
+            <span data-label="Buy price">${formatEuro(item.averageBuyPrice)}</span>
+            <span data-label="Current price">${formatEuro(item.currentPrice)}</span>
+            <span data-label="Value">${formatEuro(item.currentValue)}</span>
+            <span data-label="Profit / Loss" class="${item.profitLoss >= 0 ? "profit" : "loss"}">${formatEuro(item.profitLoss)}</span>
+            <span data-label="Allocation" class="allocation-badge">${formatPercent(item.allocationPercentage)}%</span>
+            <div class="action-buttons" aria-label="Asset actions">
                 <button class="edit-btn" data-action="edit" data-id="${item.id}">Edit</button>
                 <button class="delete-btn" data-action="delete" data-id="${item.id}">Delete</button>
             </div>
