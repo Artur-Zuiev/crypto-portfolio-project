@@ -780,9 +780,9 @@ function renderTransactions(transactions) {
                 </div>
 
                 <div class="transaction-right">
-                    <div class="transaction-quantity">${formatNumber(transaction.quantity)} ${escapeHtml(transaction.cryptoSymbol)}</div>
-                    <div class="transaction-price">${formatEuro(transaction.price)} per coin</div>
-                    <div class="transaction-total">${formatEuro(transaction.totalValue)}</div>
+                    <div class="transaction-quantity" data-label="Quantity">${formatNumber(transaction.quantity)} ${escapeHtml(transaction.cryptoSymbol)}</div>
+                    <div class="transaction-price" data-label="Price per coin">${formatEuro(transaction.price)} per coin</div>
+                    <div class="transaction-total" data-label="Total">${formatEuro(transaction.totalValue)}</div>
                 </div>
             </div>
         `;
