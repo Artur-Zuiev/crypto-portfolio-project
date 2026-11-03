@@ -37,3 +37,10 @@ jobs:
           done
       - name: Test mobile navigation and responsive integration
         run: node --test frontend/tests/*.test.mjs
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build deployable Java and frontend image
+        run: docker build -t crypto-portfolio:ci .
