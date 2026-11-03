@@ -8,7 +8,7 @@
 // Адрес backend-сервера и общие параметры страницы.
 // ==================================================
 
-const API_URL = "http://localhost:8080/api";
+const API_URL = `${window.location.protocol}//${window.location.hostname}:8080/api`;
 const PRICE_REFRESH_INTERVAL_MINUTES = 5;
 const token = localStorage.getItem("token");
 
