@@ -56,7 +56,9 @@ let pointerMovedDistance = 0;
 let isDraggingScene = false;
 let motionPaused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const API_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const API_URL = window.location.port === "5500"
+    ? `${window.location.protocol}//${window.location.hostname}:8080`
+    : `${window.location.origin}`;
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
