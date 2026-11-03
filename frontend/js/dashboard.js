@@ -181,6 +181,14 @@ function formatNumber(value) {
     });
 }
 
+function formatPercent(value) {
+    const percent = Number(value);
+    return (Number.isFinite(percent) ? percent : 0).toLocaleString("de-DE", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
+
 function formatDateTime(value) {
     if (!value) {
         return "not updated yet";
@@ -392,8 +400,8 @@ async function loadSummary() {
         if (dom.assetCount) dom.assetCount.textContent = summary.assetCount || 0;
 
         setProfitText(dom.totalProfitLoss, summary.totalProfitLoss);
-        setCoinResult(dom.bestCoin, summary.bestAssetSymbol, summary.bestAssetProfitLoss);
-        setCoinResult(dom.worstCoin, summary.worstAssetSymbol, summary.worstAssetProfitLoss);
+        setCoinResult(dom.bestCoin, summary.bestAssetSymbol, summary.bestAssetProfitLoss, "No gains yet", "No assets yet", summary.assetCount);
+        setCoinResult(dom.worstCoin, summary.worstAssetSymbol, summary.worstAssetProfitLoss, "No losses yet", "No assets yet", summary.assetCount);
     } catch (error) {
         [dom.totalValue, dom.totalInvested, dom.totalProfitLoss, dom.assetCount, dom.bestCoin, dom.worstCoin]
             .forEach((element) => {
@@ -413,22 +421,18 @@ function setProfitText(element, value) {
     element.className = Number(value || 0) >= 0 ? "profit" : "loss";
 }
 
-function setCoinResult(element, symbol, profitLoss) {
-    if (!element) {
-        return;
-    }
+function setCoinResult(element, symbol, profitLoss, noResultText = "No change yet", emptyText = "No assets yet", assetCount = 0) {
+    if (!element) return;
 
-    // An empty portfolio has neither a best nor a worst coin.
-    if (!symbol || symbol === "-") {
-        element.textContent = "No assets yet";
+    const result = Number(profitLoss || 0);
+    if (!symbol || symbol === "-" || !Number.isFinite(result) || result === 0) {
+        element.textContent = Number(assetCount) > 0 ? noResultText : emptyText;
         element.className = "";
         return;
     }
 
-    const result = Number(profitLoss || 0);
-    // Zero is neutral; never display a misleading minus sign.
-    element.textContent = `${symbol} ${formatEuro(result === 0 ? 0 : result)}`;
-    element.className = result > 0 ? "profit" : result < 0 ? "loss" : "";
+    element.textContent = `${symbol} ${formatEuro(result)}`;
+    element.className = result > 0 ? "profit" : "loss";
 }
 
 
@@ -703,7 +707,7 @@ function renderAllocationChart(portfolio) {
             <div class="allocation-info">
                 <span class="coin-symbol" style="--allocation-color:${colors[index % colors.length]}">${escapeHtml(item.symbol)}</span>
                 <span class="allocation-name">${escapeHtml(item.name)}</span>
-                <span class="allocation-percent">${formatNumber(percent)}%</span>
+                <span class="allocation-percent">${formatPercent(percent)}%</span>
             </div>
             <div class="allocation-track">
                 <div class="allocation-fill" style="width:${percent.toFixed(4)}%;--allocation-color:${colors[index % colors.length]}"></div>
@@ -843,7 +847,7 @@ function renderPortfolioList() {
             <span>${formatEuro(item.currentPrice)}</span>
             <span>${formatEuro(item.currentValue)}</span>
             <span class="${item.profitLoss >= 0 ? "profit" : "loss"}">${formatEuro(item.profitLoss)}</span>
-            <span class="allocation-badge">${formatNumber(item.allocationPercentage)}%</span>
+            <span class="allocation-badge">${formatPercent(item.allocationPercentage)}%</span>
             <div class="action-buttons">
                 <button class="edit-btn" data-action="edit" data-id="${item.id}">Edit</button>
                 <button class="delete-btn" data-action="delete" data-id="${item.id}">Delete</button>
