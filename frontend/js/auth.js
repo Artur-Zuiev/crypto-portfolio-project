@@ -1,5 +1,7 @@
 // Authentication UI — handles offline backend and non-JSON server errors safely.
-const API_URL = `${window.location.protocol}//${window.location.hostname}:8080/api`;
+const API_URL = window.location.port === "5500"
+    ? `${window.location.protocol}//${window.location.hostname}:8080/api`
+    : `${window.location.origin}/api`;
 const registerForm = document.getElementById("registerForm");
 const loginForm = document.getElementById("loginForm");
 const message = document.getElementById("message");
