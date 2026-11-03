@@ -45,6 +45,7 @@ public class CryptoService {
     }
 
     public ResponseEntity<List<CryptoCurrency>> getAllCrypto() {
+        ensureDefaultCurrencies();
         List<CryptoCurrency> cryptoCurrencies = cryptoCurrencyRepository.findAll();
 
         return ResponseEntity.ok(cryptoCurrencies);
