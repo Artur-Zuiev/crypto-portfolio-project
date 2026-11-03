@@ -79,6 +79,27 @@ For local development, serve the `frontend` folder using a local HTTP server (fo
 
 Check the frontend API base URL and the backend CORS settings for your local environment. The exact database configuration and end-to-end setup may need adjustment; a fully working deployment is **not** claimed here.
 
+## Portfolio analytics (dashboard update)
+
+The dashboard distinguishes:
+- **Unrealized P/L:** change in the market value of current positions versus their weighted-average purchase cost.
+- **Realized P/L:** gain or loss from recorded sales. The authenticated endpoint `GET /api/portfolio/performance/realized` replays BUY/SELL history chronologically with a weighted-average cost basis using `BigDecimal`.
+- **Combined P/L:** realized plus unrealized amounts, displayed only when the recorded sale history can be matched to buys.
+- **Value history:** genuine observations of portfolio value taken while the dashboard is opened/refreshed and stored **locally in that browser**, per logged-in account (up to 90 days/360 samples). This is not a reconstructed historical-price chart and does not sync between devices.
+
+Realized P/L does not include trading fees or taxes. Direct editing/deleting of holdings bypasses the trade ledger and can make historic cost reconciliation incomplete. Unmatched sales are explicitly reported instead of inventing a profit. The system is a demonstration portfolio tracker, not accounting software.
+
+Tiny nonzero gains/losses retain additional decimals, while normal euro values use two decimal places. The 3D view provides reset-camera and pause-motion controls (and respects the operating system's reduced-motion preference).
+
+### Final local verification
+
+1. Keep the existing `crypto_portfolio` PostgreSQL database; no new tables are required for these analytics. Start Java 21 backend with the existing local `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET` variables, with no `bootstrap` profile.
+2. Serve the updated `frontend/` files (e.g. Live Server on port 5500) and log in.
+3. Confirm that Realized/Unrealized/Combined P&L cards load. The existing recorded BTC partial sale should appear in Realized P/L.
+4. Refresh the dashboard at different times to create genuine history observations. The chart will initially say it needs another observation.
+5. Test 3D Reset view, Pause motion, asset selection, and Reload 3D.
+6. Verify that holdings, BUY/SELL history and fractional amounts have not changed. Only then consider merging the feature branch.
+
 ## Code organization
 
 The frontend styles are separated into reusable foundational rules and page-specific blocks. JavaScript files are organized by UI responsibility. The backend follows Spring Boot's application structure.
