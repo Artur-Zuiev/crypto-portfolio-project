@@ -3,7 +3,9 @@
 // Адрес backend-сервера для страницы transactions.html.
 // ==================================================
 
-const API_URL = `${window.location.protocol}//${window.location.hostname}:8080/api`;
+const API_URL = window.location.port === "5500"
+    ? `${window.location.protocol}//${window.location.hostname}:8080/api`
+    : `${window.location.origin}/api`;
 
 
 // ==================================================
