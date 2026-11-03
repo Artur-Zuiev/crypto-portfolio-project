@@ -88,9 +88,11 @@
                     <h2>Portfolio Objects</h2>
                 </div>
 
-                <button id="reloadSceneBtn" type="button">
-                    Reload 3D
-                </button>
+                <div class="scene-toolbar-actions">
+                    <button id="resetViewBtn" type="button" title="Reset camera to portfolio overview">Reset view</button>
+                    <button id="pauseMotionBtn" type="button" aria-pressed="false" title="Pause the floating and rotation animations">Pause motion</button>
+                    <button id="reloadSceneBtn" type="button">Reload 3D</button>
+                </div>
             </div>
 
             <div id="threeContainer" class="three-container"></div>
