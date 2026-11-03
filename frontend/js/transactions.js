@@ -133,13 +133,13 @@ function renderAllTransactions(transactions) {
             </div>
 
             <div class="transaction-right">
-                <div class="transaction-quantity">
+                <div class="transaction-quantity" data-label="Quantity">
                     ${formatNumber(transaction.quantity)} ${escapeHtml(transaction.cryptoSymbol)}
                 </div>
-                <div class="transaction-price">
+                <div class="transaction-price" data-label="Price per coin">
                     ${formatEuro(transaction.price)} per coin
                 </div>
-                <div class="transaction-total">
+                <div class="transaction-total" data-label="Total">
                     ${formatEuro(transaction.totalValue)}
                 </div>
             </div>
