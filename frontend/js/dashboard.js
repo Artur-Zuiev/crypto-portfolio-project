@@ -167,11 +167,14 @@ function apiSend(path, method, body = null) {
 // ==================================================
 
 function formatEuro(value) {
-    const numeric = Number(value || 0);
-    const normalized = Math.abs(numeric) < 0.005 ? 0 : numeric;
-    return `${normalized.toLocaleString("de-DE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return "—";
+    const magnitude = Math.abs(amount);
+    // Preserve visible sub-cent movement instead of turning small P/L into 0,00 €.
+    const digits = magnitude > 0 && magnitude < 0.005 ? 18 : 2;
+    return `${amount.toLocaleString("de-DE", {
+        minimumFractionDigits: digits === 2 ? 2 : 0,
+        maximumFractionDigits: digits
     })} €`;
 }
 
@@ -402,6 +405,9 @@ async function loadSummary() {
         setProfitText(dom.totalProfitLoss, summary.totalProfitLoss);
         setCoinResult(dom.bestCoin, summary.bestAssetSymbol, summary.bestAssetProfitLoss, "No gains yet", "No assets yet", summary.assetCount);
         setCoinResult(dom.worstCoin, summary.worstAssetSymbol, summary.worstAssetProfitLoss, "No losses yet", "No assets yet", summary.assetCount);
+        saveObservedValue(summary.totalValue);
+        renderValueHistory();
+        await loadRealizedPerformance(summary.totalProfitLoss);
     } catch (error) {
         [dom.totalValue, dom.totalInvested, dom.totalProfitLoss, dom.assetCount, dom.bestCoin, dom.worstCoin]
             .forEach((element) => {
@@ -410,6 +416,126 @@ async function loadSummary() {
 
         console.error(error);
     }
+}
+
+// ==================================================
+// RECORDED PERFORMANCE / TRADE ACCOUNTING
+// ==================================================
+
+async function loadRealizedPerformance(unrealizedValue) {
+    const realizedNode = $("#realizedProfitLoss");
+    const combinedNode = $("#combinedProfitLoss");
+    const note = $("#realizedProfitNote");
+
+    try {
+        const data = await apiGet("/portfolio/performance/realized");
+        if (!data) return;
+        const realized = Number(data.realizedProfitLoss ?? 0);
+        const unmatched = Number(data.unmatchedSales ?? 0);
+        // Do not publish a misleading combined total when cost history is incomplete.
+        if (unmatched > 0) {
+            if (realizedNode) realizedNode.textContent = "Incomplete history";
+            if (combinedNode) combinedNode.textContent = "—";
+            if (note) note.textContent = `${unmatched} sale(s) cannot be matched to recorded buys`;
+            return;
+        }
+        setProfitText(realizedNode, realized);
+        setProfitText(combinedNode, realized + Number(unrealizedValue || 0));
+        if (note) note.textContent = `${data.completedSales ?? 0} recorded sale(s), weighted-average cost`;
+    } catch (error) {
+        if (realizedNode) realizedNode.textContent = "Unavailable";
+        if (combinedNode) combinedNode.textContent = "—";
+        if (note) note.textContent = "Could not load trade performance";
+        console.error("Realized profit unavailable:", error);
+    }
+}
+
+// This is NOT a reconstruction of historical market prices. Each point is a real
+// value observed while the dashboard was open. Data is browser-local and
+// isolated per logged-in account; no historical prices are invented.
+function valueHistoryStorageKey() {
+    const email = dom.userEmail?.textContent?.trim() || "";
+    if (!email || email === "No email" || email === "Server error") return null;
+    return `crypto-portfolio-observations-v1:${email}`;
+}
+
+function getObservedValues() {
+    const key = valueHistoryStorageKey();
+    if (!key) return [];
+    try {
+        const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(entry => Number.isFinite(entry?.at) &&
+            Number.isFinite(entry?.value) && entry.value >= 0);
+    } catch { return []; }
+}
+
+function saveObservedValue(totalValue) {
+    const key = valueHistoryStorageKey();
+    const amount = Number(totalValue);
+    if (!key || !Number.isFinite(amount) || amount < 0) return;
+    try {
+        const list = getObservedValues();
+        const now = Date.now();
+        const last = list[list.length - 1];
+        // Record price movements at most once per minute; record unchanged
+        // values only every 10 minutes to avoid flooding localStorage.
+        if (last && now - last.at < 60000) return;
+        if (last && now - last.at < 600000 && Math.abs(last.value - amount) < 0.00000001) return;
+        const cutoff = now - 90 * 86400000;
+        const history = [...list, { at: now, value: amount }]
+            .filter(entry => entry.at >= cutoff).slice(-360);
+        localStorage.setItem(key, JSON.stringify(history));
+    } catch (error) {
+        console.warn("Could not save local value observation", error);
+    }
+}
+
+function renderValueHistory() {
+    const node = $("#portfolioHistoryGraph");
+    const counter = $("#historySampleCount");
+    if (!node) return;
+    const entries = getObservedValues();
+    if (counter) counter.textContent = `${entries.length} observation${entries.length === 1 ? "" : "s"}`;
+    if (entries.length < 2) {
+        node.innerHTML = '<p class="performance-chart-empty">Your value history starts now. Open or refresh the dashboard later to collect more observations.</p>';
+        return;
+    }
+
+    const width = 900, height = 260;
+    const left = 76, right = 24, top = 24, bottom = 46;
+    const plotWidth = width - left - right, plotHeight = height - top - bottom;
+    const start = entries[0].at, end = entries[entries.length - 1].at;
+    const rawMin = Math.min(...entries.map(point => point.value));
+    const rawMax = Math.max(...entries.map(point => point.value));
+    const padding = Math.max((rawMax - rawMin) * 0.12, Math.max(rawMax, 1) * 0.004);
+    const min = Math.max(0, rawMin - padding), max = rawMax + padding;
+    const x = point => left + (point.at - start) / Math.max(end - start, 1) * plotWidth;
+    const y = point => top + (max - point.value) / Math.max(max - min, 0.00001) * plotHeight;
+    const coords = entries.map(point => [x(point), y(point)]);
+    const line = coords.map(([px, py], i) => `${i === 0 ? "M" : "L"}${px.toFixed(2)},${py.toFixed(2)}`).join(" ");
+    const floor = height - bottom;
+    const area = `${line} L${coords[coords.length - 1][0].toFixed(2)},${floor} L${coords[0][0].toFixed(2)},${floor} Z`;
+    const grid = Array.from({ length: 4 }, (_, i) => {
+        const value = min + (max - min) * i / 3;
+        const py = top + (3 - i) / 3 * plotHeight;
+        return `<line class="chart-grid" x1="${left}" y1="${py}" x2="${width - right}" y2="${py}"/>` +
+            `<text x="${left - 12}" y="${py + 4}" text-anchor="end">${formatEuro(value)}</text>`;
+    }).join("");
+    const dates = [entries[0], entries[entries.length - 1]].map(point =>
+        `<text x="${x(point)}" y="${height - 16}" text-anchor="${point === entries[0] ? "start" : "end"}">${new Date(point.at).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</text>`
+    ).join("");
+    const latest = coords[coords.length - 1];
+    node.innerHTML = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="value-history-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#668bff" stop-opacity=".26"/>
+          <stop offset="100%" stop-color="#668bff" stop-opacity="0"/>
+        </linearGradient></defs>
+        ${grid}<path class="chart-area" d="${area}"/>
+        <path class="chart-line" d="${line}"/>
+        <circle class="chart-point" cx="${latest[0]}" cy="${latest[1]}" r="5"/>
+        ${dates}</svg>`;
+    node.setAttribute("aria-label", `Portfolio value observations from ${formatEuro(entries[0].value)} to ${formatEuro(entries[entries.length - 1].value)}`);
 }
 
 function setProfitText(element, value) {
