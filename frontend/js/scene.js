@@ -157,7 +157,7 @@ function initScene() {
     });
 
     renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.matchMedia("(max-width: 720px)").matches ? 1.4 : 2));
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -313,7 +313,7 @@ function addFloor() {
 // ==================================================
 
 function addParticles() {
-    const particlesCount = 340;
+    const particlesCount = window.matchMedia("(max-width: 720px)").matches ? 120 : 340;
     const positions = new Float32Array(particlesCount * 3);
 
     for (let i = 0; i < particlesCount; i++) {
