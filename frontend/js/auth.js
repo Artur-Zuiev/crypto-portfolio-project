@@ -1,5 +1,5 @@
 // Authentication UI — handles offline backend and non-JSON server errors safely.
-const API_URL = "http://localhost:8080/api";
+const API_URL = `${window.location.protocol}//${window.location.hostname}:8080/api`;
 const registerForm = document.getElementById("registerForm");
 const loginForm = document.getElementById("loginForm");
 const message = document.getElementById("message");
@@ -20,7 +20,7 @@ async function sendAuthRequest(endpoint, payload) {
             body: JSON.stringify(payload)
         });
     } catch (error) {
-        throw new Error("Cannot reach the API. Start the Spring Boot backend on localhost:8080 and try again.");
+        throw new Error("Cannot reach the API. Start Spring Boot on port 8080 and check the server IP / Wi-Fi connection.");
     }
     const contentType = response.headers.get("content-type") || "";
     let data = {};
