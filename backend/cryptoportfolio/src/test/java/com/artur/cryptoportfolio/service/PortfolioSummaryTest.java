@@ -38,7 +38,7 @@ class PortfolioSummaryTest {
         User user = new User();
         user.setEmail("example@localhost");
         when(users.findByEmail("example@localhost")).thenReturn(Optional.of(user));
-        when(portfolioItems.findByUserId(any())).thenReturn(List.of(holdings));
+        when(portfolioItems.findByUserId(isNull())).thenReturn(List.of(holdings));
         return (PortfolioSummaryResponse) service.getPortfolioSummaryByUserEmail("example@localhost").getBody();
     }
 
