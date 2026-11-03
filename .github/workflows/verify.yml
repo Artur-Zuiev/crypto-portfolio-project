@@ -21,7 +21,7 @@ jobs:
           cache: maven
           cache-dependency-path: backend/cryptoportfolio/pom.xml
       - name: Run isolated transaction and precision tests
-        run: mvn -B '-Dtest=TransactionPrecisionTest,PortfolioQuantityPrecisionTest,JwtServiceTest' test
+        run: mvn -B '-Dtest=TransactionPrecisionTest,PortfolioQuantityPrecisionTest,CryptoCatalogTest,JwtServiceTest' test
 
   frontend-syntax:
     runs-on: ubuntu-latest
