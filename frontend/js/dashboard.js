@@ -363,9 +363,14 @@ async function refreshPrices({ silent = false } = {}) {
             showMessage("Prices updated successfully", "success");
         }
     } catch (error) {
-        if (!silent) {
-            showMessage(error.message || "Could not refresh prices", "error");
+        // The API can initialize the coin list even when CoinGecko is unavailable.
+        // Reload it so the selector uses real database IDs, never hard-coded ones.
+        try {
+            await loadCryptoList();
+        } catch (reloadError) {
+            console.error("Coin list reload failed:", reloadError);
         }
+        showMessage(error.message || "Could not refresh prices", "error");
         console.error(error);
     } finally {
         setButtonLoading(dom.refreshPricesBtn, false, "Updating...", "Refresh Prices");
