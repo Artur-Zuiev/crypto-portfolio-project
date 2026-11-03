@@ -77,59 +77,74 @@ public class CryptoService {
         return coinIds.get(symbol);
     }
 
-    public ResponseEntity<?> updatePrices() {
-        List<CryptoCurrency> cryptoCurrencies = cryptoCurrencyRepository.findAll();
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        for (CryptoCurrency crypto : cryptoCurrencies) {
-            String symbol = crypto.getSymbol().trim().toUpperCase();
-            String coinGeckoId = getCoinGeckoId(symbol);
-
-            if (coinGeckoId == null) {
-                continue;
-            }
-
-            String url = "https://api.coingecko.com/api/v3/simple/price?ids="
-                    + coinGeckoId
-                    + "&vs_currencies=eur&include_market_cap=true";
-
-            try {
-                ResponseEntity<Map<String, Map<String, Double>>> apiResponse =
-                        restTemplate.exchange(
-                                url,
-                                HttpMethod.GET,
-                                null,
-                                new ParameterizedTypeReference<Map<String, Map<String, Double>>>() {}
-                        );
-
-                Map<String, Map<String, Double>> response = apiResponse.getBody();
-
-                if (response == null || !response.containsKey(coinGeckoId)) {
-                    continue;
-                }
-
-                Map<String, Double> coinData = response.get(coinGeckoId);
-
-                Double price = coinData.get("eur");
-                Double marketCap = coinData.get("eur_market_cap");
-
-                if (price != null) {
-                    crypto.setCurrentPrice(price);
-                }
-
-                if (marketCap != null) {
-                    crypto.setMarketCap(marketCap);
-                }
-
-                crypto.setLastUpdated(LocalDateTime.now());
-                cryptoCurrencyRepository.save(crypto);
-
-            } catch (Exception error) {
-                System.out.println("Could not update price for " + symbol + ": " + error.getMessage());
+    // The dashboard previously displayed hard-coded coins after a database reset.
+    // Create their records first; prices remain unavailable until a provider returns them.
+    private void ensureDefaultCurrencies() {
+        Map<String, String> defaults = Map.of(
+                "BTC", "Bitcoin", "ETH", "Ethereum", "SOL", "Solana",
+                "ADA", "Cardano", "BNB", "Binance Coin");
+        for (String symbol : List.of("BTC", "ETH", "SOL", "ADA", "BNB")) {
+            if (cryptoCurrencyRepository.findBySymbol(symbol).isEmpty()) {
+                CryptoCurrency currency = new CryptoCurrency();
+                currency.setSymbol(symbol);
+                currency.setName(defaults.get(symbol));
+                currency.setCurrentPrice(0.0);
+                currency.setMarketCap(0.0);
+                currency.setLastUpdated(null);
+                cryptoCurrencyRepository.save(currency);
             }
         }
+    }
 
-        return ResponseEntity.ok(new MessageResponse("Prices updated successfully"));
+    public ResponseEntity<?> updatePrices() {
+        ensureDefaultCurrencies();
+        List<CryptoCurrency> currencies = cryptoCurrencyRepository.findAll();
+
+        // One CoinGecko request for all five coins, rather than five calls
+        // that are more likely to hit the public API's rate limit.
+        String ids = "bitcoin,ethereum,solana,cardano,binancecoin";
+        String url = "https://api.coingecko.com/api/v3/simple/price?ids="
+                + ids + "&vs_currencies=eur&include_market_cap=true";
+
+        Map<String, Map<String, Double>> response;
+        try {
+            ResponseEntity<Map<String, Map<String, Double>>> result =
+                    new RestTemplate().exchange(url, HttpMethod.GET, null,
+                            new ParameterizedTypeReference<Map<String, Map<String, Double>>>() {});
+            response = result.getBody();
+        } catch (Exception error) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(new MessageResponse("Price provider unavailable. Please retry Refresh Prices later."));
+        }
+
+        if (response == null || response.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(new MessageResponse("Price provider returned no cryptocurrency prices."));
+        }
+
+        int updated = 0;
+        for (CryptoCurrency currency : currencies) {
+            String id = getCoinGeckoId(currency.getSymbol().trim().toUpperCase());
+            Map<String, Double> values = id == null ? null : response.get(id);
+            if (values == null) continue;
+
+            Double price = values.get("eur");
+            if (price == null || !Double.isFinite(price) || price <= 0) continue;
+
+            currency.setCurrentPrice(price);
+            Double cap = values.get("eur_market_cap");
+            if (cap != null && Double.isFinite(cap) && cap >= 0) {
+                currency.setMarketCap(cap);
+            }
+            currency.setLastUpdated(LocalDateTime.now());
+            cryptoCurrencyRepository.save(currency);
+            updated++;
+        }
+
+        if (updated == 0) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(new MessageResponse("No valid EUR prices returned. Please retry later."));
+        }
+        return ResponseEntity.ok(new MessageResponse("Updated " + updated + " cryptocurrency prices."));
     }
 }
