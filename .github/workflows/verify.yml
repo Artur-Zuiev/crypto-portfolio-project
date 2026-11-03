@@ -34,6 +34,6 @@ jobs:
         run: |
           for file in frontend/js/*.js; do
             node --check "$file"
+          done
       - name: Test mobile navigation and responsive integration
         run: node --test frontend/tests/*.test.mjs
-          done
